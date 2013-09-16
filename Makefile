@@ -30,7 +30,7 @@ clean:
 	find . -name '*~' -exec rm -f {}
 
 lint:
-	flake8 mypackage > violations.flake8.txt
+	flake8 articlefoundry > violations.flake8.txt
 
 test:
 	nosetests
