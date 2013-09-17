@@ -16,6 +16,10 @@ if sys.argv[-1] == 'publish':
 README = open('README.rst').read()
 LICENSE = open("LICENSE").read()
 
+requires = [
+    "lxml",
+]
+
 setup(
     name='articlefoundry',
     version=articlefoundry.__version__,
@@ -25,7 +29,7 @@ setup(
     author='Jack LaBarba',
     author_email='jlabarba@plos.org',
     url='http://github/PLOS-Web/articlefoundry',
-    install_requires=[''],
+    install_requires=requires,
     packages=[],
     include_package_data=True,
     scripts=[''],

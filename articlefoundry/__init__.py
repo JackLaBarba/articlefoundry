@@ -1,4 +1,5 @@
 #! ../env/bin/python
+from article import Article  # NOQA
 
 __version__ = '0.0.1'
 
