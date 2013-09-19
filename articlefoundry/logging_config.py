@@ -8,4 +8,3 @@ logging.basicConfig(level=logging.DEBUG,
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
 logging.getLogger('').addHandler(console)
-

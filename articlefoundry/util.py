@@ -1,7 +1,7 @@
 import re
 
 import logging
-import logging_config
+import logging_config  # noqa
 logger = logging.getLogger(__name__)
 
 
