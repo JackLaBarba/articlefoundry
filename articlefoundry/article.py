@@ -41,18 +41,24 @@ class Article(object):
             return None
 
     def __del__(self):
-        # close xml trees
+        self.close()
+        # del xml trees
         #  -
-        # close file objects
+        # del file objects
         if self.xml_orig_file:
-            self.xml_orig_file.close()
             del self.xml_orig_file
         if self.zip_file:
-            self.zip_file.close()
             del self.zip_file
         if self.pdf_file:
-            self.pdf_file.close()
             del self.pdf_file
+            
+    def close(self):
+        if self.xml_orig_file:
+            self.xml_orig_file.close()
+        if self.zip_file:
+            self.zip_file.close()
+        if self.pdf_file:
+            self.pdf_file.close()
 
     def open_xml_orig(self):
         # Identify xml.orig
