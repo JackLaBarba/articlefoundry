@@ -1,6 +1,5 @@
 import os
 import re
-import zipfile
 
 from lxml import etree
 
@@ -51,7 +50,7 @@ class Article(object):
             del self.zip_file
         if self.pdf_file:
             del self.pdf_file
-            
+
     def close(self):
         if self.xml_orig_file:
             self.xml_orig_file.close()
@@ -82,4 +81,4 @@ class Article(object):
     def get_pdf_page_count(self):
         if not self.pdf_file:
             self.open_pdf()
-        return util.get_pdf_page_count(string=self.pdf_file.read())
+        return util.get_pdf_page_count(byte_stream=self.pdf_file.read())

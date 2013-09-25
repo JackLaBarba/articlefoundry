@@ -1,20 +1,21 @@
 import os
 import shutil
-import StringIO
 import zipfile
+
 
 def tuplesearch(s, t):
     f_ed = filter(lambda x: s == x[0], t)
     if f_ed:
         return map(lambda x: x[1], f_ed)
     raise KeyError("%s not found" % s)
-    
+
+
 class MZipFile():
-    
+
     def __init__(self, filename):
         self.filename = filename
         self.zipfile = zipfile.ZipFile(self.filename, 'a')
-        
+
     def __del__(self):
         pass
 
@@ -31,21 +32,19 @@ class MZipFile():
                 new = tuplesearch(f, mv_list)[0]
             except KeyError:
                 new = f
-                
+
             if new:
-                print new
-                f_obj = self.zipfile.open(f)
                 temp_zip.writestr(new, self.zipfile.read(f))
 
         # Mark the files as having been created on Windows so that
         # Unix permissions are not inferred as 0000
         for zfile in temp_zip.filelist:
-            zfile.create_system = 0   
+            zfile.create_system = 0
 
         # shuffle archives around
         self.zipfile.close()
         temp_zip.close()
-        
+
         os.remove(self.filename)
         shutil.move(temp_filename, self.filename)
         self.zipfile = zipfile.ZipFile(self.filename, 'a')
