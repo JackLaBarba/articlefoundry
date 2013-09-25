@@ -12,4 +12,3 @@ class TestArticle(unittest.TestCase):
     def test_get_pagecount(self):
         self.assertEqual(self.a.get_pdf_page_count(), 10)
 
-        
