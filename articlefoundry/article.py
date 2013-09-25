@@ -5,6 +5,7 @@ import zipfile
 from lxml import etree
 
 import util
+from mzipfile import MZipFile
 
 import logging
 import logging_config  # noqa
@@ -34,7 +35,7 @@ class Article(object):
         # Open zip file
         try:
             logger.debug("Attempting to open file, %s ..." % archive_file)
-            self.zip_file = zipfile.ZipFile(archive_file, 'r')
+            self.zip_file = MZipFile(archive_file)
         except IOError, e:
             logger.error(e)
             return None
@@ -57,7 +58,7 @@ class Article(object):
         # Identify xml.orig
         orig_filename = "%s.xml.orig" % self.doi
         try:
-            self.xml_orig_file = self.zip_file.open(orig_filename)
+            self.xml_orig_file = self.zip_file.zipfile.open(orig_filename)
         except KeyError:
             logger.error("Archive is missing %s" % orig_filename)
             return None
@@ -70,7 +71,7 @@ class Article(object):
         self.xml_orig_tree = etree.parse(self.xml_orig_file, parser)
 
     def open_pdf(self):
-        self.pdf_file = self.zip_file.open("%s.pdf" % self.doi)
+        self.pdf_file = self.zip_file.zipfile.open("%s.pdf" % self.doi)
 
     def get_pdf_page_count(self):
         if not self.pdf_file:

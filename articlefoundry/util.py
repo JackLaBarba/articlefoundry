@@ -24,3 +24,14 @@ def get_pdf_page_count(filename=None, string=None):
                                 re.MULTILINE | re.DOTALL)
 
     return len(rx_count_pages.findall(pdf_content))
+
+def normalize_si_label(s):
+    return s.strip().replace(' ','').lower().translate(None, string.punctuation)
+
+def get_si_entries(meta_etree):
+    """
+
+    """
+    pass
+    
+    
