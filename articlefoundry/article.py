@@ -20,8 +20,16 @@ class Article(object):
     xml_orig_file = None
     pdf_file = None
 
-    def __init__(self, archive_file):
-        # Figure out DOI
+    def __init__(self, archive_file=None, doi=None):
+        if archive_file:
+            self.create_from_archive(archive_file)
+        elif doi:
+            self.doi = doi
+        else:
+            raise ValueError("Article class needs an archive file or a doi "
+                             "to make an object")
+
+    def create_from_archive(self, archive_file):
         logger.debug("Discerning DOI from '%s' ..." % archive_file)
         match = re.match('\w{4}\.\d{7}', os.path.split(archive_file)[1])
         if match:
