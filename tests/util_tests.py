@@ -17,9 +17,18 @@ class TestSIFuncs(unittest.TestCase):
         self.meta_file = file(self.meta_filename)
         parser = etree.XMLParser(recover=True)
         self.meta_etree = etree.parse(self.meta_file, parser)
+
+        self.article_filename = os.path.join(os.path.split(__file__)[0],
+                                      'pone.0070111.xml.orig')
+        self.article_file = file(self.article_filename)
+        parser = etree.XMLParser(recover=True)
+        self.article_etree = etree.parse(self.article_file, parser)
         
     def test_get_si_links(self):
-        logger.debug("SI links: %s" % get_si_links_from_meta(self.meta_etree))
+        logger.debug("SI meta links: %s" % get_si_links_from_meta(self.meta_etree))
 
     def test_get_fig_links(self):
         logger.debug("FIG links: %s" % get_fig_links_from_meta(self.meta_etree))
+
+    def test_get_article_si_links(self):
+        logger.debug("SI article links: %s" % get_si_links_from_article(self.article_etree))

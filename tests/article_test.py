@@ -3,6 +3,7 @@ import os
 import unittest
 from articlefoundry import Article
 
+
 class TestArticle(unittest.TestCase):
     
     def setUp(self):

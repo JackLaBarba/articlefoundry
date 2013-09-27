@@ -5,9 +5,10 @@ import logging
 import logging_config  # noqa
 logger = logging.getLogger(__name__)
 
+
 def ordinal_format(i):
-    k=i%10
-    return "%d%s"%(i,"tsnrhtdd"[(i/10%10!=1)*(k<4)*k::4])
+    k = i % 10
+    return "%d%s" % (i, "tsnrhtdd"[(i / 10 % 10 != 1) * (k < 4) * k::4])
 
 
 def get_pdf_page_count(filename=None, byte_stream=None):
@@ -39,15 +40,37 @@ def normalize_string(s):
     return r
 
 
+def get_si_links_from_article(article_etree):
+    article_links = {}
+    for i, si in enumerate(article_etree.xpath("//supplementary-material")):
+        try:
+            label_raw = si.xpath("label")[0].text
+        except IndexError:
+            logger.error("%s article SI entry is missing a label" %
+                         ordinal_format(i))
+            continue
+
+        label = normalize_string(label_raw)
+        try:
+            link = si.attrib['{http://www.w3.org/1999/xlink}href']
+        except KeyError:
+            logger.error("%s article SI entry, '%s', is missing an href" %
+                         (ordinal_format(i), label_raw))
+            link = None
+
+        article_links[label] = link
+
+    return article_links
+
+
 def get_si_links_from_meta(meta_etree):
-    strk_img = {}
     meta_links = {}
     for i, si in enumerate(meta_etree.xpath("//supplementary-material")):
         try:
             label_raw = si.xpath("label")[0].text
-        except IndexError, e:
-            logger.error("%s SI entry is missing a label" 
-                         % ordinal_format(i))
+        except IndexError:
+            logger.error("%s SI entry is missing a label" %
+                         ordinal_format(i))
             continue
         label = normalize_string(label_raw)
         if label in meta_links:
@@ -56,38 +79,39 @@ def get_si_links_from_meta(meta_etree):
             continue
         try:
             link = si.attrib['{http://www.w3.org/1999/xlink}href']
-        except KeyError, e:
-            logger.error("%s SI entry, '%s', is missing an href" 
-                         % (ordinal_format(i), label_raw))
-            link=None
-            
+        except KeyError:
+            logger.error("%s SI entry, '%s', is missing an href" %
+                         (ordinal_format(i), label_raw))
+            link = None
+
         meta_links[label] = link
 
     return meta_links
 
 
 def get_fig_links_from_meta(meta_etree):
-    fig_links = {}    
+    fig_links = {}
     for i, fig in enumerate(meta_etree.xpath("//fig")):
         try:
             label_raw = fig.xpath("label")[0].text
-        except IndexError, e:
-            logger.error("%s figure is missing a label" 
-                         % ordinal_format(i))
+        except IndexError:
+            logger.error("%s figure is missing a label" %
+                         ordinal_format(i))
             continue
 
         label = normalize_string(label_raw)
         try:
-            link = fig.xpath("graphic")[0].attrib['{http://www.w3.org/1999/xlink}href']
-        except IndexError, e:
-            logger.error("%s figure, '%s', is missing a graphic entry" 
-                         % (ordinal_format(i), label_raw))
-            link=None            
-        except KeyError, e:
-            logger.error("%s figure, '%s', is missing an href" 
-                         % (ordinal_format(i), label_raw))
-            link=None
+            graphic = fig.xpath("graphic")[0]
+            link = graphic.attrib['{http://www.w3.org/1999/xlink}href']
+        except IndexError:
+            logger.error("%s figure, '%s', is missing a graphic entry" %
+                         (ordinal_format(i), label_raw))
+            link = None
+        except KeyError:
+            logger.error("%s figure, '%s', is missing an href" %
+                         (ordinal_format(i), label_raw))
+            link = None
 
         fig_links[label] = link
-        
+
     return fig_links
