@@ -32,3 +32,9 @@ class TestSIFuncs(unittest.TestCase):
 
     def test_get_article_si_links(self):
         logger.debug("SI article links: %s" % get_si_links_from_article(self.article_etree))
+
+    def test_get_fig_file_mv_list(self):
+        doi = 'pone.0012345'
+        fig_links_dict = get_fig_links_from_meta(self.meta_etree)
+        mv_files = get_fig_file_mv_list(doi, fig_links_dict)
+        logger.debug("mv_list: %s" % mv_files)

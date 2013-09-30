@@ -6,15 +6,23 @@ import logging_config  # noqa
 logger = logging.getLogger(__name__)
 
 
+def tuplesearch(s, t, normalizer=None):
+    if normalizer:
+        f_ed = filter(lambda x: normalizer(s) ==
+                      normalizer(x[0]), t)
+    else:
+        f_ed = filter(lambda x: s == x[0], t)
+    if f_ed:
+        return map(lambda x: x[1], f_ed)
+    raise KeyError("%s not found" % s)
+
+
 def ordinal_format(i):
     k = i % 10
     return "%d%s" % (i, "tsnrhtdd"[(i / 10 % 10 != 1) * (k < 4) * k::4])
 
 
 def get_pdf_page_count(filename=None, byte_stream=None):
-    """
-
-    """
     if not file and not byte_stream:
         raise ValueError("Need to specify either a file or string for "
                          "get_pdf_page_count")
@@ -115,3 +123,37 @@ def get_fig_links_from_meta(meta_etree):
         fig_links[label] = link
 
     return fig_links
+
+
+def get_fig_file_mv_list(doi, fig_links_dict):
+    mv_files = []
+    taken_ordinals = []
+    striking_image_found = False
+    for label, link in fig_links_dict.iteritems():
+        ordinal_matches = re.findall(r'\d{1,4}', label)
+        if 'strikingimage' in label:
+            if striking_image_found:
+                logger.error("Found multiple figures identified as "
+                             "'striking'.  Ignoring '%s'" %
+                             label)
+                continue
+            striking_image_found = True
+            new_name = "%s.strk.tif" % doi
+            mv_files.append((link, new_name))
+        if ordinal_matches:
+            ordinal = ordinal_matches[-1]
+            if ordinal in taken_ordinals:
+                logger.error("Found two figure labels with number, %s. "
+                             "Failing to rename further occurences." %
+                             ordinal)
+                continue
+            else:
+                taken_ordinals.append(ordinal)
+        if not ordinal_matches:
+            logger.error("Unable to determine figure number from label, '%s'. "
+                         "Figure file not renamed" % label)
+            continue
+        new_name = "%s.g%s.tif" % (doi, ordinal.zfill(3))
+        mv_files.append((link, new_name))
+
+    return mv_files
