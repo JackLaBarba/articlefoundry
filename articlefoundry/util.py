@@ -1,15 +1,17 @@
 import re
 import string
+from lxml import etree
 
 import logging
 import logging_config  # noqa
+
 logger = logging.getLogger(__name__)
 
 
 def tuplesearch(s, t, normalizer=None):
     if normalizer:
         f_ed = filter(lambda x: normalizer(s) ==
-                      normalizer(x[0]), t)
+                                normalizer(x[0]), t)
     else:
         f_ed = filter(lambda x: s == x[0], t)
     if f_ed:
@@ -20,6 +22,14 @@ def tuplesearch(s, t, normalizer=None):
 def ordinal_format(i):
     k = i % 10
     return "%d%s" % (i, "tsnrhtdd"[(i / 10 % 10 != 1) * (k < 4) * k::4])
+
+
+def normalize_string(s):
+    r = s.strip()
+    r = r.replace(' ', '')
+    r = r.lower()
+    r = r.translate(None, string.punctuation)
+    return r
 
 
 def get_pdf_page_count(filename=None, byte_stream=None):
@@ -40,90 +50,69 @@ def get_pdf_page_count(filename=None, byte_stream=None):
     return len(rx_count_pages.findall(pdf_content))
 
 
-def normalize_string(s):
-    r = s.strip()
-    r = r.replace(' ', '')
-    r = r.lower()
-    r = r.translate(None, string.punctuation)
-    return r
+class NLMXMLObject(object):
+    def __init__(self, xml_file):
+        parser = etree.XMLParser(recover=True)
+        self.etree = etree.parse(xml_file, parser)
+        self.self_ref_name = "NLM XML document"
+
+    def get_si_links(self):
+        si_links = []
+        for i, si in enumerate(self.etree.xpath("//supplementary-material")):
+            si_elem = {}
+            try:
+                si_elem['label'] = si.xpath("label")[0].text
+            except IndexError:
+                logger.error("%s %s SI entry is missing a label" %
+                             (ordinal_format(i), self.self_ref_name))
+                continue
+
+            try:
+                si_elem['link'] = si.attrib['{http://www.w3.org/1999/xlink}href']
+            except KeyError:
+                logger.error("%s %s SI entry, '%s', is missing an href" %
+                             (ordinal_format(i), self.self_ref_name, label_raw))
+
+            si_links.append(si_elem)
+
+        return si_links
+
+    def get_fig_links(self):
+        fig_links = []
+        for i, fig in enumerate(self.etree.xpath("//fig")):
+            fig_elem = {}
+            try:
+                fig_elem['label'] = fig.xpath("label")[0].text
+            except IndexError:
+                logger.error("%s figure in %s is missing a label" %
+                             (ordinal_format(i), self.self_ref_name))
+                continue
+
+            try:
+                graphic = fig.xpath("graphic")[0]
+                fig_elem['link'] = graphic.attrib['{http://www.w3.org/1999/xlink}href']
+            except IndexError:
+                logger.error("%s figure in %s, '%s', is missing a graphic entry" %
+                             (ordinal_format(i), self.self_ref_name, label_raw))
+            except KeyError:
+                logger.error("%s figure in %s, '%s', is missing an href" %
+                             (ordinal_format(i), self.self_ref_name, label_raw))
+
+            fig_links.append(fig_elem)
+
+        return fig_links
 
 
-def get_si_links_from_article(article_etree):
-    article_links = {}
-    for i, si in enumerate(article_etree.xpath("//supplementary-material")):
-        try:
-            label_raw = si.xpath("label")[0].text
-        except IndexError:
-            logger.error("%s article SI entry is missing a label" %
-                         ordinal_format(i))
-            continue
-
-        label = normalize_string(label_raw)
-        try:
-            link = si.attrib['{http://www.w3.org/1999/xlink}href']
-        except KeyError:
-            logger.error("%s article SI entry, '%s', is missing an href" %
-                         (ordinal_format(i), label_raw))
-            link = None
-
-        article_links[label] = link
-
-    return article_links
+class ArticleXMLObject(NLMXMLObject):
+    def __init__(self, *args):
+        super(ArticleXMLObject, self).__init__(*args)
+        self.self_ref_name = "article xml.orig"
 
 
-def get_si_links_from_meta(meta_etree):
-    meta_links = {}
-    for i, si in enumerate(meta_etree.xpath("//supplementary-material")):
-        try:
-            label_raw = si.xpath("label")[0].text
-        except IndexError:
-            logger.error("%s SI entry is missing a label" %
-                         ordinal_format(i))
-            continue
-        label = normalize_string(label_raw)
-        if label in meta_links:
-            logger.error("Metadata contains more than one SI entry with "
-                         "label, %s" % label)
-            continue
-        try:
-            link = si.attrib['{http://www.w3.org/1999/xlink}href']
-        except KeyError:
-            logger.error("%s SI entry, '%s', is missing an href" %
-                         (ordinal_format(i), label_raw))
-            link = None
-
-        meta_links[label] = link
-
-    return meta_links
-
-
-def get_fig_links_from_meta(meta_etree):
-    fig_links = {}
-    for i, fig in enumerate(meta_etree.xpath("//fig")):
-        try:
-            label_raw = fig.xpath("label")[0].text
-        except IndexError:
-            logger.error("%s figure is missing a label" %
-                         ordinal_format(i))
-            continue
-
-        label = normalize_string(label_raw)
-        try:
-            graphic = fig.xpath("graphic")[0]
-            link = graphic.attrib['{http://www.w3.org/1999/xlink}href']
-        except IndexError:
-            logger.error("%s figure, '%s', is missing a graphic entry" %
-                         (ordinal_format(i), label_raw))
-            link = None
-        except KeyError:
-            logger.error("%s figure, '%s', is missing an href" %
-                         (ordinal_format(i), label_raw))
-            link = None
-
-        fig_links[label] = link
-
-    return fig_links
-
+class MetadataXMLObject(NLMXMLObject):
+    def __init__(self, *args):
+        super(MetadataXMLObject, self).__init__(*args)
+        self.self_ref_name = "article xml.orig"
 
 def get_fig_file_mv_list(doi, fig_links_dict):
     mv_files = []
@@ -144,7 +133,7 @@ def get_fig_file_mv_list(doi, fig_links_dict):
             ordinal = ordinal_matches[-1]
             if ordinal in taken_ordinals:
                 logger.error("Found two figure labels with number, %s. "
-                             "Failing to rename further occurences." %
+                             "Failing to rename further occurrences." %
                              ordinal)
                 continue
             else:

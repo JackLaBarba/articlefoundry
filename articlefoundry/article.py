@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class Article(object):
     doi = None
     # xml trees
-    xml_orig_tree = None
+    xml_orig_obj = None
     # file streams
     zip_file = None
     xml_orig_file = None
@@ -78,13 +78,45 @@ class Article(object):
 
     def parse_xml_orig(self):
         # Parse xml.orig
+        if not self.xml_orig_file:
+            self.open_xml_orig()
         orig_filename = "%s.xml.orig" % self.doi
         logger.debug("Parsing %s ..." % orig_filename)
-        parser = etree.XMLParser(recover=True)
-        self.xml_orig_tree = etree.parse(self.xml_orig_file, parser)
+        self.xml_orig_obj = util.ArticleXMLObject(self.xml_orig_file)
 
     def open_pdf(self):
         self.pdf_file = self.zip_file.zipfile.open("%s.pdf" % self.doi)
+
+    def list_package_fig_assets(self):
+        files = []
+        for f in self.zip_file.zipfile.filelist:
+            if re.match("%s\.g\d{3}\.tif" % self.doi,
+                        f.filename, re.IGNORECASE):
+                files.append(f.filename)
+        return files
+
+    def list_package_si_assets(self):
+        files = []
+        for f in self.zip_file.zipfile.filelist:
+            if re.match("%s\.s\d{3}\." % self.doi,
+                        f.filename, re.IGNORECASE):
+                files.append(f.filename)
+        return files
+
+    def list_expected_fig_assets(self):
+        if not self.xml_orig_obj:
+            self.parse_xml_orig()
+        return self.xml_orig_obj.get_fig_links()
+
+    def list_expected_si_assets(self):
+        if not self.xml_orig_obj:
+            self.parse_xml_orig()
+        return self.xml_orig_obj.get_si_links()
+
+    def list_missing_si_assets(self):
+        expected = set([f['link'] for f in self.list_expected_si_assets()])
+        present = set(self.list_package_si_assets())
+        return list(expected - present)
 
     def get_pdf_page_count(self):
         if not self.pdf_file:
