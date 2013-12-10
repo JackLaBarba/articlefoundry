@@ -1,7 +1,7 @@
 import os
 
 import unittest
-from articlefoundry import Article
+from articlefoundry import Article, MetadataPackage
 import logging
 import articlefoundry.logging_config  # noqa
 
@@ -14,6 +14,7 @@ class TestArticle(unittest.TestCase):
         test_zip = os.path.join(os.path.split(__file__)[0], 'pone.0070111.zip')
         self.a = Article(test_zip)
 
+    #TODO Add assertions
     def test_get_pagecount(self):
         self.assertEqual(self.a.get_pdf_page_count(), 10)
 
@@ -31,3 +32,13 @@ class TestArticle(unittest.TestCase):
 
     def test_list_missing_si_assets(self):
         logger.debug("Missing si assets: %s" % self.a.list_missing_si_assets())
+
+
+class TestMetadataPackage(unittest.TestCase):
+
+    def setUp(self):
+        test_zip = os.path.join(os.path.split(__file__)[0], 'pone_3b1d8099-ae81-4fd3-8c72-5ca741bb39d9.zip')
+        self.m = MetadataPackage(test_zip)
+
+    def test_parsing(self):
+        self.assertEqual(True, True)

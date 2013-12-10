@@ -7,6 +7,12 @@ import logging_config  # noqa
 
 logger = logging.getLogger(__name__)
 
+def get_single(iter, name="element"):
+    if len(iter) != 1:
+        raise ValueError("Found %s %s(s) when I expected 1!" %
+                         (len(iter), name))
+    else:
+        return iter[0]
 
 def tuplesearch(s, t, normalizer=None):
     if normalizer:
@@ -49,6 +55,16 @@ def get_pdf_page_count(filename=None, byte_stream=None):
 
     return len(rx_count_pages.findall(pdf_content))
 
+
+class GOXMLObject(object):
+    def __init__(self, xml_file):
+        parser = etree.XMLParser(recover=True)
+        self.etree = etree.parse(xml_file, parser)
+
+    def get_production_task_id(self):
+        prod_ids = self.etree.xpath("//header/parameters/parameter[@name='production-task-id']")
+        prod_id = get_single(prod_ids, "guid")
+        return prod_id.attrib['value']
 
 class NLMXMLObject(object):
     def __init__(self, xml_file):
@@ -113,6 +129,8 @@ class MetadataXMLObject(NLMXMLObject):
     def __init__(self, *args):
         super(MetadataXMLObject, self).__init__(*args)
         self.self_ref_name = "article xml.orig"
+
+
 
 def get_fig_file_mv_list(doi, fig_links_dict):
     mv_files = []
