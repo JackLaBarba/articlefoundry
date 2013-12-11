@@ -105,6 +105,11 @@ class GOXMLObject(object):
         prod_id = get_single(prod_ids, "guid")
         return prod_id.attrib['value']
 
+    def get_production_task_name(self):
+        production_task_names = self.etree.xpath("//header/parameters/parameter[@name='production-task-name']")
+        production_task_name = get_single(production_task_names, "production task name")
+        return production_task_name.attrib['value']
+
     def get_metadata_filename(self):
         prod_ids = self.etree.xpath("//filegroup/metadata-file")
         prod_id = get_single(prod_ids, "guid")

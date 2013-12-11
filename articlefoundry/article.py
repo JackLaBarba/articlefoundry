@@ -78,6 +78,8 @@ class MetadataPackage(object):
         return self.goxml.get_doi()
 
 
+
+
 class Article(object):
     doi = None
     # xml trees

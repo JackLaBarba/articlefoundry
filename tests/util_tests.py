@@ -53,6 +53,10 @@ class TestSIFuncs(unittest.TestCase):
 
         self.assertEquals(self.goxml_xml.get_files(), figs)
 
+    def test_get_production_task_name(self):
+        self.assertEquals(self.goxml_xml.get_production_task_name(),
+                          "Merops Send to Production - Author Notification")
+
 
 """
     def test_get_fig_file_mv_list(self):
