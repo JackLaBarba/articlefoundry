@@ -41,6 +41,11 @@ class TestSIFuncs(unittest.TestCase):
         self.assertEquals(self.goxml_xml.get_production_task_id(),
                           "3b1d8099-ae81-4fd3-8c72-5ca741bb39d9")
 
+    def test_get_metadata_filename(self):
+        self.assertEquals(self.goxml_xml.get_metadata_filename(),
+                          "pone_PONE-D-13-27833.xml")
+
+
 """
     def test_get_fig_file_mv_list(self):
         doi = 'pone.0012345'

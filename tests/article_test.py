@@ -42,3 +42,6 @@ class TestMetadataPackage(unittest.TestCase):
 
     def test_parsing(self):
         self.assertEqual(True, True)
+
+    def test_get_doi(self):
+        self.assertEqual(self.m.get_doi().long, "10.1371/journal.pone.0074265")

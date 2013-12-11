@@ -55,6 +55,45 @@ def get_pdf_page_count(filename=None, byte_stream=None):
 
     return len(rx_count_pages.findall(pdf_content))
 
+class PlosDoi(object):
+    RE_SHORT_DOI_PATTERN = "[a-z]*\.[0-9]*"
+
+    _short_doi = None
+
+    def __init__(self, doi_str):
+        self._pub_prefix = "10.1371/journal."
+
+        short_form_match = re.compile(self.RE_SHORT_DOI_PATTERN)
+        long_form_match = re.compile('(?<=10\.1371/journal\.)%s' %
+                                     self.RE_SHORT_DOI_PATTERN)
+        ambra_doi_match = re.compile('^(?<=info\:doi/10\.1371/journal\.)%s$' %
+                                     self.RE_SHORT_DOI_PATTERN)
+
+        if short_form_match.match(doi_str):
+            self._short_doi = doi_str
+            logger.debug("Parsing short form doi: %s" % doi_str)
+        elif long_form_match.search(doi_str):
+            self._short_doi = long_form_match.search(doi_str).group()
+            logger.debug("Parsing long form doi: %s" % doi_str)
+        elif ambra_doi_match.search(doi_str):
+            self._short_doi = ambra_doi_match.search(doi_str).group()
+            logger.debug("Parsing ambra-style doi: %s" % doi_str)
+        else:
+            raise ValueError("Couldn't parse doi %s" % doi_str)
+
+        logger.debug("Constructed Doi object with shortform doi: %s" % self._short_doi)
+
+    @property
+    def short(self):
+        return self._short_doi
+
+    @property
+    def long(self):
+        return "%s%s" % (self._pub_prefix, self._short_doi)
+
+    def __str__(self):
+        return self._short_doi
+
 
 class GOXMLObject(object):
     def __init__(self, xml_file):
@@ -65,6 +104,17 @@ class GOXMLObject(object):
         prod_ids = self.etree.xpath("//header/parameters/parameter[@name='production-task-id']")
         prod_id = get_single(prod_ids, "guid")
         return prod_id.attrib['value']
+
+    def get_metadata_filename(self):
+        prod_ids = self.etree.xpath("//filegroup/metadata-file")
+        prod_id = get_single(prod_ids, "guid")
+        return prod_id.attrib['name']
+
+    def get_doi(self):
+        prod_ids = self.etree.xpath("//header/parameters/parameter[@name='DOI']")
+        prod_id = get_single(prod_ids, "DOI")
+        return PlosDoi(prod_id.attrib['value'])
+
 
 class NLMXMLObject(object):
     def __init__(self, xml_file):
