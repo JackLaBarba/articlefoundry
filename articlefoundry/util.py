@@ -111,9 +111,14 @@ class GOXMLObject(object):
         return prod_id.attrib['name']
 
     def get_doi(self):
-        prod_ids = self.etree.xpath("//header/parameters/parameter[@name='DOI']")
-        prod_id = get_single(prod_ids, "DOI")
-        return PlosDoi(prod_id.attrib['value'])
+        dois = self.etree.xpath("//header/parameters/parameter[@name='DOI']")
+        doi = get_single(dois, "DOI")
+        return PlosDoi(doi.attrib['value'])
+
+    def get_files(self):
+        files = self.etree.xpath("//filegroup/file")
+        return [f.attrib['name'] for f in files]
+
 
 
 class NLMXMLObject(object):

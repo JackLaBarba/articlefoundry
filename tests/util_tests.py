@@ -45,6 +45,14 @@ class TestSIFuncs(unittest.TestCase):
         self.assertEquals(self.goxml_xml.get_metadata_filename(),
                           "pone_PONE-D-13-27833.xml")
 
+    def test_get_files(self):
+        figs = ['Figure7.tif', 'Figure2.tif', 'Figure5.tif', 'Figure3.tif',
+                'TableS1_Sampling Conditions.pdf', 'newton.docx', 'Figure1.tif',
+                'STable2_TaxonomyTable.pdf', 'Figure S1.tif', 'Figure6.tif',
+                'TableS2_TaxonomyTable.pdf', 'Figure4.tif']
+
+        self.assertEquals(self.goxml_xml.get_files(), figs)
+
 
 """
     def test_get_fig_file_mv_list(self):

@@ -45,3 +45,17 @@ class TestMetadataPackage(unittest.TestCase):
 
     def test_get_doi(self):
         self.assertEqual(self.m.get_doi().long, "10.1371/journal.pone.0074265")
+
+
+class TestMetadataPackageSI(unittest.TestCase):
+
+    def setUp(self):
+        test_zip = os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip')
+        self.m = MetadataPackage(test_zip)
+
+    def test_parsing(self):
+        self.assertEqual(True, True)
+
+    def test_get_doi(self):
+        self.assertEqual(self.m.get_doi().long, "10.1371/journal.pone.0077196")
+
