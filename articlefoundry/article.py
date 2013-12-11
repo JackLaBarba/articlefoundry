@@ -77,7 +77,20 @@ class MetadataPackage(object):
             self._parse_goxml()
         return self.goxml.get_doi()
 
+    def is_si_export(self):
+        if not self.goxml:
+            self._parse_goxml()
+        return (self.goxml.get_production_task_name() ==
+                "Send Supporting Information Files to PLoS Server")
 
+    def verify_si_export(self):
+        if not self.is_si_export():
+            raise NotImplementedError("This method doesn't work for this type of export: '%s'" %
+                self.goxml.get_production_task_name())
+
+    def get_si_filenames(self):
+        self.verify_si_export()
+        return self.goxml.get_files()
 
 
 class Article(object):

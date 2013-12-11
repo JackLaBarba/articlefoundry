@@ -59,3 +59,8 @@ class TestMetadataPackageSI(unittest.TestCase):
     def test_get_doi(self):
         self.assertEqual(self.m.get_doi().long, "10.1371/journal.pone.0077196")
 
+    def test_get_si_filenames(self):
+        files = ['Supporting Table S1.doc', 'Supporting Table S3.doc',
+                 'Supporting Methods.doc', 'Supporting Table S2.doc']
+        self.assertEquals(self.m.get_si_filenames(), files)
+
