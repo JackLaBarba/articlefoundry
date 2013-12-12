@@ -147,7 +147,7 @@ class NLMXMLObject(object):
                 si_elem['link'] = si.attrib['{http://www.w3.org/1999/xlink}href']
             except KeyError:
                 logger.error("%s %s SI entry, '%s', is missing an href" %
-                             (ordinal_format(i), self.self_ref_name, label_raw))
+                             (ordinal_format(i), self.self_ref_name, si_elem['label']))
 
             si_links.append(si_elem)
 
@@ -169,10 +169,10 @@ class NLMXMLObject(object):
                 fig_elem['link'] = graphic.attrib['{http://www.w3.org/1999/xlink}href']
             except IndexError:
                 logger.error("%s figure in %s, '%s', is missing a graphic entry" %
-                             (ordinal_format(i), self.self_ref_name, label_raw))
+                             (ordinal_format(i), self.self_ref_name, fig_elem['label']))
             except KeyError:
                 logger.error("%s figure in %s, '%s', is missing an href" %
-                             (ordinal_format(i), self.self_ref_name, label_raw))
+                             (ordinal_format(i), self.self_ref_name, fig_elem['label']))
 
             fig_links.append(fig_elem)
 
@@ -190,16 +190,18 @@ class MetadataXMLObject(NLMXMLObject):
         super(MetadataXMLObject, self).__init__(*args)
         self.self_ref_name = "article xml.orig"
 
-def normalized_find(list, key, value, normalizer=None):
+
+def normalized_find(target_list, key, value, normalizer=None):
     if not normalizer:
         normalizer = lambda x: x
 
     matches = []
-    for index, item in enumerate(list):
+    for index, item in enumerate(target_list):
         if normalizer(item.get(key)) == normalizer(value):
             matches.append(index)
 
     return matches
+
 
 def zip_together_assets(expected, adding, matching_level=0, partial_completion=[]):
 
