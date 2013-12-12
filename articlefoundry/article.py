@@ -90,7 +90,9 @@ class MetadataPackage(object):
 
     def get_si_filenames(self):
         self.verify_si_export()
-        return self.goxml.get_files()
+        if not self.metadata:
+            self._parse_metadata()
+        return sorted(self.metadata.get_si_links(), key=lambda x: x.get('label'))
 
 
 class Article(object):
@@ -102,16 +104,16 @@ class Article(object):
     xml_orig_file = None
     pdf_file = None
 
-    def __init__(self, archive_file=None, doi=None):
+    def __init__(self, archive_file=None, doi=None, new_cw_file=False):
         if archive_file:
-            self.create_from_archive(archive_file)
+            self.create_from_archive(archive_file, new_cw_file)
         elif doi:
             self.doi = doi
         else:
             raise ValueError("Article class needs an archive file or a doi "
                              "to make an object")
 
-    def create_from_archive(self, archive_file):
+    def create_from_archive(self, archive_file, new_cw_file=False):
         logger.debug("Discerning DOI from '%s' ..." % archive_file)
         match = re.match('\w{4}\.\d{7}', os.path.split(archive_file)[1])
         if match:
@@ -128,6 +130,9 @@ class Article(object):
         except IOError, e:
             logger.error(e)
             return None
+
+        if new_cw_file:
+            self.zip_file.mv([('%s.xml' % self.doi, '%s.xml.orig' % self.doi)])
 
     def __del__(self):
         self.close()
@@ -183,12 +188,13 @@ class Article(object):
             if re.match("%s\.s\d{3}\." % self.doi,
                         f.filename, re.IGNORECASE):
                 files.append(f.filename)
-        return files
+        return sorted(files, key=lambda x: x.get('label'))
 
     def list_expected_fig_assets(self):
         if not self.xml_orig_obj:
             self.parse_xml_orig()
-        return self.xml_orig_obj.get_fig_links()
+        return sorted(self.xml_orig_obj.get_fig_links(),
+                      key=lambda x: x.get('label'))
 
     def list_expected_si_assets(self):
         if not self.xml_orig_obj:
@@ -204,3 +210,12 @@ class Article(object):
         if not self.pdf_file:
             self.open_pdf()
         return util.get_pdf_page_count(byte_stream=self.pdf_file.read())
+
+    def consume_si_package(self, mdpack):
+        if not isinstance(mdpack, MetadataPackage):
+            raise ValueError("mdpack needs to be a MetadataPackage object")
+        si_assets = self.list_expected_si_assets()
+        logger.debug("Article expects %s SI file(s): %s" % (len(si_assets), si_assets))
+        mdpack_si_assets = mdpack.get_si_filenames()
+        logger.debug("SI package contains %s SI file(s): %s" % (len(mdpack_si_assets), mdpack_si_assets))
+        logger.debug(util.zip_together_assets(si_assets, mdpack_si_assets))

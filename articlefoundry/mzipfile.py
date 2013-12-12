@@ -23,12 +23,12 @@ class MZipFile():
         temp_zip = zipfile.ZipFile(temp_filename, 'w')
         for f in self.zipfile.namelist():
             try:
-                new = tuplesearch(f, mv_list, normalizer)[0]
+                new_name = tuplesearch(f, mv_list, normalizer)[0]
             except KeyError:
-                new = f
+                new_name = f
 
-            if new:
-                temp_zip.writestr(new, self.zipfile.read(f))
+            if new_name:
+                temp_zip.writestr(new_name, self.zipfile.read(f))
 
         # Mark the files as having been created on Windows so that
         # Unix permissions are not inferred as 0000
@@ -44,6 +44,11 @@ class MZipFile():
         self.zipfile = zipfile.ZipFile(self.filename, 'a')
 
         return self
+
+    def add(self, file, filename):
+        self.zipfile.writestr(filename, self.zipfile.read(file))
+        for zfile in self.zipfile:
+            zfile.create_system = 0
 
     def close(self):
         self.zipfile.close()

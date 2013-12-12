@@ -190,6 +190,81 @@ class MetadataXMLObject(NLMXMLObject):
         super(MetadataXMLObject, self).__init__(*args)
         self.self_ref_name = "article xml.orig"
 
+def normalized_find(list, key, value, normalizer=None):
+    if not normalizer:
+        normalizer = lambda x: x
+
+    matches = []
+    for index, item in enumerate(list):
+        if normalizer(item.get(key)) == normalizer(value):
+            matches.append(index)
+
+    return matches
+
+def zip_together_assets(expected, adding, matching_level=0, partial_completion=[]):
+
+    if not expected:
+        logger.debug("All expected assets found a match.")
+        if adding:
+            logger.info("I was unable to merge in the following assets due "
+                        "to no apparent match in article XML being found: %s" % adding)
+        return partial_completion
+
+    if not adding:
+        logger.info("Ran out of assets to merge in but I still need matches for"
+                    " the following links in the article XML: %s" % expected)
+        return partial_completion
+
+    if matching_level == 0:
+        matching_level_name = "exact match"
+        normalizer = lambda x: x
+    elif matching_level == 1:
+        matching_level_name = "no-whitespace match"
+        normalizer = lambda x: x.strip()
+    elif matching_level == 2:
+        matching_level_name = "case-insensitive, no-whitespace match"
+        normalizer = lambda x: x.strip().lower()
+    elif matching_level == 3:
+        matching_level_name = "no-punctuation, case-insensitive, no-whitespace match"
+        normalizer = lambda x: x.strip().lower().translate(None, string.punctuation)
+    else:
+        logger.info("I've run out of match relaxations, but there are still assets that need matching.\n"
+                    "I'm still expecting assets for these: %s\n"
+                    "And I wasn't able to merge in these: %s" %
+                    (expected, adding))
+        return partial_completion
+
+    expected_match_mask = [0] * len(expected)
+    adding_match_mask = [0] * len(expected)
+
+    zippered = partial_completion
+
+    logger.debug("Attempting to locate SI files via %s..." % matching_level_name)
+    for i, asset in enumerate(expected):
+        matches = normalized_find(adding, 'label',
+                                  asset.get('label'), normalizer=normalizer)
+        if len(matches) == 1:
+            logger.debug("Matching %s with %s" % (asset, adding[matches[0]]))
+            zippered.append({'expected': asset,
+                             'new': adding[matches[0]]})
+            expected_match_mask[i] = 1
+            adding_match_mask[matches[0]] = 1
+        elif len(matches) >= 1:
+            logger.error("Found %s SI file matches for %s when I only expected one!" %
+                         (len(matches), asset))
+            raise ValueError("Found %s SI file matches for %s when I only expected one!" %
+                             (len(matches), asset))
+        else:
+            logger.debug("No SI asset found for %s using %s" % (asset, matching_level_name))
+
+    return zip_together_assets([expected[i] for i in xrange(len(expected)) if not expected_match_mask[i]],
+                               [adding[i] for i in xrange(len(adding)) if not adding_match_mask[i]],
+                               matching_level+1, zippered)
+
+
+
+
+
 
 
 def get_fig_file_mv_list(doi, fig_links_dict):

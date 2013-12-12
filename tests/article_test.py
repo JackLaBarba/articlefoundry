@@ -11,12 +11,15 @@ logger = logging.getLogger(__name__)
 class TestArticle(unittest.TestCase):
     
     def setUp(self):
-        test_zip = os.path.join(os.path.split(__file__)[0], 'pone.0070111.zip')
-        self.a = Article(test_zip)
+        test_zip = os.path.join(os.path.split(__file__)[0], 'pone.0077196.zip')
+        self.a = Article(test_zip, new_cw_file=True)
+
+        test_zip = os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip')
+        self.m = MetadataPackage(test_zip)
 
     #TODO Add assertions
     def test_get_pagecount(self):
-        self.assertEqual(self.a.get_pdf_page_count(), 10)
+        self.assertEqual(self.a.get_pdf_page_count(), 17)
 
     def test_list_expected_fig_assets(self):
         logger.debug("Expected fig assets: %s" % self.a.list_expected_fig_assets())
@@ -32,6 +35,9 @@ class TestArticle(unittest.TestCase):
 
     def test_list_missing_si_assets(self):
         logger.debug("Missing si assets: %s" % self.a.list_missing_si_assets())
+
+    def test_consume_si_package(self):
+        self.a.consume_si_package(self.m)
 
 
 class TestMetadataPackage(unittest.TestCase):
@@ -60,7 +66,11 @@ class TestMetadataPackageSI(unittest.TestCase):
         self.assertEqual(self.m.get_doi().long, "10.1371/journal.pone.0077196")
 
     def test_get_si_filenames(self):
-        files = ['Supporting Table S1.doc', 'Supporting Table S3.doc',
-                 'Supporting Methods.doc', 'Supporting Table S2.doc']
+        logger.debug(self.m.get_si_filenames())
+        files = [{'link': 'Supporting Methods.doc', 'label': 'Methods S1'},
+                 {'link': 'Supporting Table S1.doc', 'label': 'Table S1'},
+                 {'link': 'Supporting Table S2.doc', 'label': 'Table S2'},
+                 {'link': 'Supporting Table S3.doc', 'label': 'Table S3'}]
+
         self.assertEquals(self.m.get_si_filenames(), files)
 
