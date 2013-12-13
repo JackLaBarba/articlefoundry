@@ -67,10 +67,10 @@ class TestMetadataPackageSI(unittest.TestCase):
 
     def test_get_si_filenames(self):
         logger.debug(self.m.get_si_filenames())
-        files = [{'link': 'Supporting Methods.doc', 'label': 'Methods S1'},
+        files = [{'link': 'Supporting Methods.doc', 'label': 'Methodss1'},
                  {'link': 'Supporting Table S1.doc', 'label': 'Table S1'},
-                 {'link': 'Supporting Table S2.doc', 'label': 'Table S2'},
-                 {'link': 'Supporting Table S3.doc', 'label': 'Table S3'}]
+                 {'link': 'Supporting Table S2.doc', 'label': 'TableS2'},
+                 {'link': 'Supporting Table S3.doc', 'label': 'TableS3.'}]
 
         self.assertEquals(self.m.get_si_filenames(), files)
 

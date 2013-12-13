@@ -222,13 +222,13 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
         normalizer = lambda x: x
     elif matching_level == 1:
         matching_level_name = "no-whitespace match"
-        normalizer = lambda x: x.strip()
+        normalizer = lambda x: x.replace(" ", "")
     elif matching_level == 2:
         matching_level_name = "case-insensitive, no-whitespace match"
-        normalizer = lambda x: x.strip().lower()
+        normalizer = lambda x: x.replace(" ", "").lower()
     elif matching_level == 3:
         matching_level_name = "no-punctuation, case-insensitive, no-whitespace match"
-        normalizer = lambda x: x.strip().lower().translate(None, string.punctuation)
+        normalizer = lambda x: x.replace(" ", "").lower().translate(None, string.punctuation)
     else:
         logger.info("I've run out of match relaxations, but there are still assets that need matching.\n"
                     "I'm still expecting assets for these: %s\n"
@@ -241,7 +241,7 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
 
     zippered = partial_completion
 
-    logger.debug("Attempting to locate SI files via %s..." % matching_level_name)
+    logger.debug("Attempting to match asset files via %s..." % matching_level_name)
     for i, asset in enumerate(expected):
         matches = normalized_find(adding, 'label',
                                   asset.get('label'), normalizer=normalizer)
