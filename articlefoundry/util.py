@@ -1,11 +1,16 @@
+from __future__ import with_statement
 import re
 import string
 from lxml import etree
+import urlparse
+import os
+import urllib2
 
 import logging
 import logging_config  # noqa
 
 logger = logging.getLogger(__name__)
+
 
 def get_single(iter, name="element"):
     if len(iter) != 1:
@@ -13,6 +18,7 @@ def get_single(iter, name="element"):
                          (len(iter), name))
     else:
         return iter[0]
+
 
 def tuplesearch(s, t, normalizer=None):
     if normalizer:
@@ -54,6 +60,51 @@ def get_pdf_page_count(filename=None, byte_stream=None):
                                 re.MULTILINE | re.DOTALL)
 
     return len(rx_count_pages.findall(pdf_content))
+
+
+def download_file(url, local):
+    # Open the url
+    f = urllib2.urlopen(url)
+    logger.info("Dowloading %s to %s..." % (url, local))
+
+    # Open our local file for writing
+    with open(local, "wb") as local_file:
+        local_file.write(f.read())
+
+
+class CustomResolver(etree.Resolver):
+    cache = os.path.abspath('dtd-cache')
+    last_url = None
+
+    def resolve(self, URL, id, context):
+        #determine cache path
+        logger.debug("Attempting to resolve %s" % URL)
+        url = urlparse.urlparse(URL)
+
+        # Handle relative paths for network locations
+        if url.netloc:
+            CustomResolver.last_url = url
+        else:
+            if not CustomResolver.last_url:
+                raise ValueError("Invalid URL provided for DTD: %s" % URL)
+            url = urlparse.urlparse(urlparse.urljoin(CustomResolver.last_url.geturl(), URL))
+
+        local_base_directory = os.path.join(self.cache, url.netloc)
+        local_file = local_base_directory + url.path
+
+        #cache if necessary
+        if not os.path.exists(local_file):
+            logger.info("Creating DTD cache for %s" % url.geturl())
+            if not os.path.exists(os.path.split(local_file)[0]):
+                os.makedirs(os.path.split(local_file)[0])
+            download_file(url.geturl(), local_file)
+
+        else:
+            logger.info("Found cached copy of %s" % url.path)
+
+        #resolve the cached file
+        return self.resolve_file(open(local_file), context, base_url=URL)
+
 
 class PlosDoi(object):
     RE_SHORT_DOI_PATTERN = "[a-z]*\.[0-9]*"
@@ -125,12 +176,15 @@ class GOXMLObject(object):
         return [f.attrib['name'] for f in files]
 
 
-
 class NLMXMLObject(object):
     def __init__(self, xml_file):
-        parser = etree.XMLParser(recover=True)
-        self.etree = etree.parse(xml_file, parser)
+        self.etree = etree.parse(xml_file, self.get_parser())
         self.self_ref_name = "NLM XML document"
+
+    def get_parser(self):
+        parser = etree.XMLParser(dtd_validation=True, no_network=False)
+        parser.resolvers.add(CustomResolver())
+        return parser
 
     def get_si_links(self):
         si_links = []
@@ -190,6 +244,9 @@ class MetadataXMLObject(NLMXMLObject):
         super(MetadataXMLObject, self).__init__(*args)
         self.self_ref_name = "article xml.orig"
 
+    def get_parser(self):
+        return etree.XMLParser(recover=True)
+
 
 def normalized_find(target_list, key, value, normalizer=None):
     if not normalizer:
@@ -205,6 +262,7 @@ def normalized_find(target_list, key, value, normalizer=None):
 
 def zip_together_assets(expected, adding, matching_level=0, partial_completion=[]):
 
+    # START handling base cases
     if not expected:
         logger.debug("All expected assets found a match.")
         if adding:
@@ -235,11 +293,10 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
                     "And I wasn't able to merge in these: %s" %
                     (expected, adding))
         return partial_completion
+    # END handling base cases
 
     expected_match_mask = [0] * len(expected)
     adding_match_mask = [0] * len(expected)
-
-    zippered = partial_completion
 
     logger.debug("Attempting to match asset files via %s..." % matching_level_name)
     for i, asset in enumerate(expected):
@@ -247,7 +304,7 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
                                   asset.get('label'), normalizer=normalizer)
         if len(matches) == 1:
             logger.debug("Matching %s with %s" % (asset, adding[matches[0]]))
-            zippered.append({'expected': asset,
+            partial_completion.append({'expected': asset,
                              'new': adding[matches[0]]})
             expected_match_mask[i] = 1
             adding_match_mask[matches[0]] = 1
@@ -261,9 +318,7 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
 
     return zip_together_assets([expected[i] for i in xrange(len(expected)) if not expected_match_mask[i]],
                                [adding[i] for i in xrange(len(adding)) if not adding_match_mask[i]],
-                               matching_level+1, zippered)
-
-
+                               matching_level+1, partial_completion)
 
 
 
