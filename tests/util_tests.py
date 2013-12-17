@@ -58,6 +58,15 @@ class TestSIFuncs(unittest.TestCase):
                           "Merops Send to Production - Author Notification")
 
 
+class TestXMLParsing(unittest.TestCase):
+
+    def test_dtd_invalid(self):
+        article_filename = os.path.join(os.path.split(__file__)[0],
+                                      'pone.0070111-dtd-invalid.xml.orig')
+        article_file = file(article_filename)
+        article_xml = ArticleXMLObject(article_file)
+
+
 """
     def test_get_fig_file_mv_list(self):
         doi = 'pone.0012345'

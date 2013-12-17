@@ -78,7 +78,6 @@ class CustomResolver(etree.Resolver):
 
     def resolve(self, URL, id, context):
         #determine cache path
-        logger.debug("Attempting to resolve %s" % URL)
         url = urlparse.urlparse(URL)
 
         # Handle relative paths for network locations
@@ -94,19 +93,15 @@ class CustomResolver(etree.Resolver):
 
         #cache if necessary
         if not os.path.exists(local_file):
-            logger.info("Creating DTD cache for %s" % url.geturl())
             if not os.path.exists(os.path.split(local_file)[0]):
                 os.makedirs(os.path.split(local_file)[0])
             download_file(url.geturl(), local_file)
-
-        else:
-            logger.info("Found cached copy of %s" % url.path)
 
         #resolve the cached file
         return self.resolve_file(open(local_file), context, base_url=URL)
 
 
-class PlosDoi(object):
+class PLOSDoi(object):
     RE_SHORT_DOI_PATTERN = "[a-z]*\.[0-9]*"
 
     _short_doi = None
@@ -169,7 +164,7 @@ class GOXMLObject(object):
     def get_doi(self):
         dois = self.etree.xpath("//header/parameters/parameter[@name='DOI']")
         doi = get_single(dois, "DOI")
-        return PlosDoi(doi.attrib['value'])
+        return PLOSDoi(doi.attrib['value'])
 
     def get_files(self):
         files = self.etree.xpath("//filegroup/file")
@@ -319,9 +314,6 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
     return zip_together_assets([expected[i] for i in xrange(len(expected)) if not expected_match_mask[i]],
                                [adding[i] for i in xrange(len(adding)) if not adding_match_mask[i]],
                                matching_level+1, partial_completion)
-
-
-
 
 
 def get_fig_file_mv_list(doi, fig_links_dict):
