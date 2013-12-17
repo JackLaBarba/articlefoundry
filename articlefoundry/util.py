@@ -171,15 +171,44 @@ class GOXMLObject(object):
         return [f.attrib['name'] for f in files]
 
 
-class NLMXMLObject(object):
-    def __init__(self, xml_file):
-        self.etree = etree.parse(xml_file, self.get_parser())
-        self.self_ref_name = "NLM XML document"
+class XMLObject(object):
 
-    def get_parser(self):
+    def __init__(self, xml_file):
+        try:
+            self.etree = etree.parse(xml_file, self.get_parser())
+        except etree.XMLSyntaxError, e:
+            logger.warning("Unable to parse %s due to the following syntax error: %s" %
+                           (xml_file, unicode(e)))
+            logger.info("Falling back to more relaxed parser ...")
+            self.etree = etree.parse(xml_file, self.get_fallback_parser())
+
+        self.self_ref_name = "XML document"
+
+    @staticmethod
+    def get_parser():
         parser = etree.XMLParser(dtd_validation=True, no_network=False)
         parser.resolvers.add(CustomResolver())
         return parser
+
+    @staticmethod
+    def get_fallback_parser():
+        parser = etree.XMLParser(recover=True)
+        return parser
+
+    @staticmethod
+    def check_for_dtd_error(xml_file):
+        try:
+            xmltree = etree.parse(xml_file, XMLObject.get_parser())
+        except etree.XMLSyntaxError, e:
+            return unicode(e)
+        return ""
+
+
+class NLMXMLObject(XMLObject):
+
+    def __init__(self, xml_file):
+        super(NLMXMLObject, self).__init__(xml_file)
+        self.self_ref_name = "NLM XML Document"
 
     def get_si_links(self):
         si_links = []

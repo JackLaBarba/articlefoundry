@@ -1,4 +1,5 @@
 import os
+import lxml
 
 from lxml import etree
 
@@ -64,8 +65,15 @@ class TestXMLParsing(unittest.TestCase):
         article_filename = os.path.join(os.path.split(__file__)[0],
                                       'pone.0070111-dtd-invalid.xml.orig')
         article_file = file(article_filename)
-        article_xml = ArticleXMLObject(article_file)
+        ArticleXMLObject(article_file)
 
+    def test_check_for_dtd_error(self):
+        article_filename = os.path.join(os.path.split(__file__)[0],
+                                      'pone.0070111-dtd-invalid.xml.orig')
+        article_file = file(article_filename)
+        output = XMLObject.check_for_dtd_error(article_file)
+        logger.debug(output)
+        assert output
 
 """
     def test_get_fig_file_mv_list(self):
