@@ -74,11 +74,3 @@ class TestXMLParsing(unittest.TestCase):
         output = XMLObject.check_for_dtd_error(article_file)
         logger.debug(output)
         assert output
-
-"""
-    def test_get_fig_file_mv_list(self):
-        doi = 'pone.0012345'
-        fig_links_dict = self.meta_xml.get_fig_links()
-        mv_files = get_fig_file_mv_list(doi, fig_links_dict)
-        logger.debug("mv_list: %s" % mv_files)
-"""

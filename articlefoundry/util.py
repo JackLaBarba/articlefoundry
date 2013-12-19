@@ -141,47 +141,22 @@ class PLOSDoi(object):
         return self._short_doi
 
 
-class GOXMLObject(object):
-    def __init__(self, xml_file):
-        parser = etree.XMLParser(recover=True)
-        self.etree = etree.parse(xml_file, parser)
-
-    def get_production_task_id(self):
-        prod_ids = self.etree.xpath("//header/parameters/parameter[@name='production-task-id']")
-        prod_id = get_single(prod_ids, "guid")
-        return prod_id.attrib['value']
-
-    def get_production_task_name(self):
-        production_task_names = self.etree.xpath("//header/parameters/parameter[@name='production-task-name']")
-        production_task_name = get_single(production_task_names, "production task name")
-        return production_task_name.attrib['value']
-
-    def get_metadata_filename(self):
-        prod_ids = self.etree.xpath("//filegroup/metadata-file")
-        prod_id = get_single(prod_ids, "guid")
-        return prod_id.attrib['name']
-
-    def get_doi(self):
-        dois = self.etree.xpath("//header/parameters/parameter[@name='DOI']")
-        doi = get_single(dois, "DOI")
-        return PLOSDoi(doi.attrib['value'])
-
-    def get_files(self):
-        files = self.etree.xpath("//filegroup/file")
-        return [f.attrib['name'] for f in files]
-
-
 class XMLObject(object):
+    root = None
+    self_ref_name = None
 
     def __init__(self, xml_file):
+        xml = xml_file.read()
         try:
-            self.etree = etree.parse(xml_file, self.get_parser())
-        except etree.XMLSyntaxError, e:
+            self.root = etree.parse(xml, XMLObject.get_parser())
+        except (etree.XMLSyntaxError, ValueError), e:
             logger.warning("Unable to parse %s due to the following syntax error: %s" %
                            (xml_file, unicode(e)))
             logger.info("Falling back to more relaxed parser ...")
-            self.etree = etree.parse(xml_file, self.get_fallback_parser())
+            xml_file.seek(0)
+            self.root = etree.parse(xml, XMLObject.get_fallback_parser())
 
+        logger.debug("Root: %s" % self.root)
         self.self_ref_name = "XML document"
 
     @staticmethod
@@ -192,7 +167,8 @@ class XMLObject(object):
 
     @staticmethod
     def get_fallback_parser():
-        parser = etree.XMLParser(recover=True)
+        parser = etree.XMLParser(recover=True, dtd_validation=False, no_network=True)
+        logger.info("Giving fallback parser ...")
         return parser
 
     @staticmethod
@@ -204,6 +180,39 @@ class XMLObject(object):
         return ""
 
 
+class GOXMLObject(XMLObject):
+    """
+    def __init__(self, xml_file):
+        parser = etree.XMLParser(recover=True)
+        self.root = etree.parse(xml_file, parser)
+        super(GOXMLObject, self).__init__(xml_file)
+        self.self_ref_name = "GO XML Document"
+    """
+    def get_production_task_id(self):
+        prod_ids = self.root.xpath("//header/parameters/parameter[@name='production-task-id']")
+        prod_id = get_single(prod_ids, "guid")
+        return prod_id.attrib['value']
+
+    def get_production_task_name(self):
+        production_task_names = self.root.xpath("//header/parameters/parameter[@name='production-task-name']")
+        production_task_name = get_single(production_task_names, "production task name")
+        return production_task_name.attrib['value']
+
+    def get_metadata_filename(self):
+        prod_ids = self.root.xpath("//filegroup/metadata-file")
+        prod_id = get_single(prod_ids, "guid")
+        return prod_id.attrib['name']
+
+    def get_doi(self):
+        dois = self.root.xpath("//header/parameters/parameter[@name='DOI']")
+        doi = get_single(dois, "DOI")
+        return PLOSDoi(doi.attrib['value'])
+
+    def get_files(self):
+        files = self.root.xpath("//filegroup/file")
+        return [f.attrib['name'] for f in files]
+
+
 class NLMXMLObject(XMLObject):
 
     def __init__(self, xml_file):
@@ -212,7 +221,7 @@ class NLMXMLObject(XMLObject):
 
     def get_si_links(self):
         si_links = []
-        for i, si in enumerate(self.etree.xpath("//supplementary-material")):
+        for i, si in enumerate(self.root.xpath("//supplementary-material")):
             si_elem = {}
             try:
                 si_elem['label'] = si.xpath("label")[0].text
@@ -233,7 +242,7 @@ class NLMXMLObject(XMLObject):
 
     def get_fig_links(self):
         fig_links = []
-        for i, fig in enumerate(self.etree.xpath("//fig")):
+        for i, fig in enumerate(self.root.xpath("//fig")):
             fig_elem = {}
             try:
                 fig_elem['label'] = fig.xpath("label")[0].text
