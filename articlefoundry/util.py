@@ -64,8 +64,8 @@ def get_pdf_page_count(filename=None, byte_stream=None):
 
 def download_file(url, local):
     # Open the url
-    f = urllib2.urlopen(url)
     logger.info("Dowloading %s to %s..." % (url, local))
+    f = urllib2.urlopen(url)
 
     # Open our local file for writing
     with open(local, "wb") as local_file:
@@ -77,16 +77,16 @@ class CustomResolver(etree.Resolver):
     last_url = None
 
     def resolve(self, URL, id, context):
+        logger.debug("Fetching %s ..." % URL)
         #determine cache path
         url = urlparse.urlparse(URL)
-
         # Handle relative paths for network locations
         if url.netloc:
-            CustomResolver.last_url = url
+            self.last_url = url
         else:
-            if not CustomResolver.last_url:
+            if not self.last_url:
                 raise ValueError("Invalid URL provided for DTD: %s" % URL)
-            url = urlparse.urlparse(urlparse.urljoin(CustomResolver.last_url.geturl(), URL))
+            url = urlparse.urlparse(urlparse.urljoin(self.last_url.geturl(), URL))
 
         local_base_directory = os.path.join(self.cache, url.netloc)
         local_file = local_base_directory + url.path
@@ -148,13 +148,12 @@ class XMLObject(object):
     def __init__(self, xml_file):
         xml = xml_file.read()
         try:
-            self.root = etree.parse(xml, XMLObject.get_parser())
+            self.root = etree.XML(xml, XMLObject.get_parser())
         except (etree.XMLSyntaxError, ValueError), e:
             logger.warning("Unable to parse %s due to the following syntax error: %s" %
                            (xml_file, unicode(e)))
             logger.info("Falling back to more relaxed parser ...")
-            xml_file.seek(0)
-            self.root = etree.parse(xml, XMLObject.get_fallback_parser())
+            self.root = etree.XML(xml, XMLObject.get_fallback_parser())
 
         logger.debug("Root: %s" % self.root)
         self.self_ref_name = "XML document"
