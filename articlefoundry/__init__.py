@@ -1,5 +1,5 @@
 #! ../env/bin/python
-from article import Article  # NOQA
+from article import Article, MetadataPackage  # NOQA
 
 __version__ = '0.0.1'
 
