@@ -7,8 +7,6 @@ import os
 import urllib2
 
 import logging
-import logging_config  # noqa
-
 logger = logging.getLogger(__name__)
 
 
@@ -64,7 +62,7 @@ def get_pdf_page_count(filename=None, byte_stream=None):
 
 def download_file(url, local):
     # Open the url
-    logger.info("Dowloading %s to %s..." % (url, local))
+    logger.debug("Dowloading %s to %s..." % (url, local))
     f = urllib2.urlopen(url)
 
     # Open our local file for writing
@@ -129,6 +127,9 @@ class PLOSDoi(object):
 
         logger.debug("Constructed Doi object with shortform doi: %s" % self._short_doi)
 
+    def __cmp__(self, other):
+        return (self._short_doi == other)
+
     @property
     def short(self):
         return self._short_doi
@@ -150,9 +151,9 @@ class XMLObject(object):
         try:
             self.root = etree.XML(xml, XMLObject.get_parser())
         except (etree.XMLSyntaxError, ValueError), e:
-            logger.warning("Unable to parse %s due to the following syntax error: %s" %
+            logger.debug("Unable to parse %s due to the following syntax error: %s" %
                            (xml_file, unicode(e)))
-            logger.info("Falling back to more relaxed parser ...")
+            logger.debug("Falling back to more relaxed parser ...")
             self.root = etree.XML(xml, XMLObject.get_fallback_parser())
 
         logger.debug("Root: %s" % self.root)
@@ -167,7 +168,6 @@ class XMLObject(object):
     @staticmethod
     def get_fallback_parser():
         parser = etree.XMLParser(recover=True, dtd_validation=False, no_network=True)
-        logger.info("Giving fallback parser ...")
         return parser
 
     @staticmethod

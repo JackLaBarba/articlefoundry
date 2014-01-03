@@ -2,7 +2,11 @@ import os
 import shutil
 from util import tuplesearch
 import zipfile
-
+import logging
+logging.basicConfig(level=logging.DEBUG,
+                    format=("%(levelname)-8s "
+                            "%(message)s"))
+logger = logging.getLogger(__name__)
 
 class MZipFile():
 
@@ -45,10 +49,21 @@ class MZipFile():
 
         return self
 
-    def add(self, file, filename):
-        self.zipfile.writestr(filename, self.zipfile.read(file))
-        for zfile in self.zipfile:
+    def __repr__(self):
+        return self.filename
+
+    def add(self, f, filename):
+        logger.debug("Adding %s to %s" % (filename, self))
+        print self.zipfile.filelist
+        if filename in self.zipfile.namelist():
+            logger.debug("Replacing '%s' in archive" % filename)
+            self.mv([(filename, "")])
+        self.zipfile.writestr(filename, f.read())
+        for zfile in self.zipfile.filelist:
             zfile.create_system = 0
+
+    def get(self, filename):
+        return self.zipfile.open(filename)
 
     def close(self):
         self.zipfile.close()

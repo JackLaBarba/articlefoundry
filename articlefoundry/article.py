@@ -7,7 +7,9 @@ import util
 from mzipfile import MZipFile
 
 import logging
-import logging_config  # noqa
+logging.basicConfig(level=logging.DEBUG,
+                    format=("%(levelname)-8s "
+                            "%(message)s"))
 logger = logging.getLogger(__name__)
 
 
@@ -93,6 +95,9 @@ class MetadataPackage(object):
         if not self.metadata:
             self._parse_metadata()
         return sorted(self.metadata.get_si_links(), key=lambda x: x.get('label'))
+    
+    def __repr__(self):
+        return self._zip_filename
 
 
 class Article(object):
@@ -117,7 +122,7 @@ class Article(object):
         logger.debug("Discerning DOI from '%s' ..." % archive_file)
         match = re.match('\w{4}\.\d{7}', os.path.split(archive_file)[1])
         if match:
-            self.doi = match.group(0)
+            self.doi = util.PLOSDoi(match.group(0))
             logger.debug("DOI: %s" % self.doi)
         else:
             logger.error("Could not determine doi from filename.")
@@ -127,12 +132,16 @@ class Article(object):
         try:
             logger.debug("Attempting to open file, %s ..." % archive_file)
             self.zip_file = MZipFile(archive_file)
+            self._zip_filename = archive_file
         except IOError, e:
             logger.error(e)
             return None
 
         if new_cw_file:
             self.zip_file.mv([('%s.xml' % self.doi, '%s.xml.orig' % self.doi)])
+
+    def __repr__(self):
+        return self._zip_filename
 
     def __del__(self):
         self.close()
@@ -212,10 +221,25 @@ class Article(object):
         return util.get_pdf_page_count(byte_stream=self.pdf_file.read())
 
     def consume_si_package(self, mdpack):
+        logger.info("Attempting to insert SI files from %s to %s ..."  %
+                    (mdpack, self))
         if not isinstance(mdpack, MetadataPackage):
             raise ValueError("mdpack needs to be a MetadataPackage object")
+        if self.doi != mdpack.get_doi():
+            logging.error("SI package doi (%s) does not match article package doi "
+                          "(%s).  Exiting ..." % (mdpack.get_doi(), self.doi))
+            return
         si_assets = self.list_expected_si_assets()
         logger.debug("Article expects %s SI file(s): %s" % (len(si_assets), si_assets))
         mdpack_si_assets = mdpack.get_si_filenames()
         logger.debug("SI package contains %s SI file(s): %s" % (len(mdpack_si_assets), mdpack_si_assets))
-        logger.debug(util.zip_together_assets(si_assets, mdpack_si_assets))
+        asset_zipper = util.zip_together_assets(si_assets, mdpack_si_assets)
+        asset_zipper.sort(key=lambda x: x['expected']['link'])
+        for asset in asset_zipper:
+            logger.info("Inserting %s -> %s ..." %
+                      (asset['new']['link'], asset['expected']['link']))
+            self.zip_file.add(mdpack._zip_file.get(asset['new']['link']),
+                              asset['expected']['link'])
+
+        logger.info("Inserted %s file(s) into %s" %
+                    (len(asset_zipper), self))
