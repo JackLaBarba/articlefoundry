@@ -220,6 +220,12 @@ class Article(object):
             self.open_pdf()
         return util.get_pdf_page_count(byte_stream=self.pdf_file.read())
 
+    def check_for_dtd_error(self):
+        if not self.xml_orig_file:
+            self.open_xml_orig()
+        # ensure etree flush first
+        return util.XMLObject.check_for_dtd_error(self.xml_orig_file)
+
     def consume_si_package(self, mdpack):
         logger.info("Attempting to insert SI files from %s to %s ..."  %
                     (mdpack, self))

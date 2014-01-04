@@ -39,6 +39,9 @@ class TestArticle(unittest.TestCase):
         self.a.consume_si_package(self.m)
         self.a.close()
 
+    def test_check_for_dtd_error(self):
+        logger.debug(self.a.check_for_dtd_error())
+
 class TestMetadataPackage(unittest.TestCase):
 
     def setUp(self):
