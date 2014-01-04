@@ -17,6 +17,15 @@ def consume_si(args):
     a.consume_si_package(si)
     a.close()
 
+def check_for_dtd_error(args):
+    a = Article(archive_file=args.article_file.name)
+    error = a.check_for_dtd_error()
+    if error:
+        if args.format_ariespull:
+            print "error: DTD error: %s" % error
+        else:
+            print error
+
 def parse_call():
     desc = """
     CLI-based articlefoundry tools for preparing article archives for Ambra
@@ -26,7 +35,7 @@ def parse_call():
                         help="file location of the article .zip")
     parser.add_argument('-l', '--logging-level', nargs=1, help="logging level (defaults to ERROR",
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'])
-    subparsers = parser.add_subparsers(help='action dispatcher')
+    subparsers = parser.add_subparsers(help='action dispatcher: define an action to apply to article_file')
     
     # pdf pagecount help
     parser_pdf = subparsers.add_parser('get-pdf-page-count',
@@ -34,12 +43,20 @@ def parse_call():
     parser_pdf.set_defaults(func=get_pdf_page_count)
 
     # si consume
-    parser_si = subparsers. add_parser('consume-si',
+    parser_si = subparsers.add_parser('consume-si',
                                        help='merge in SI files found in an external .zip')
     parser_si.add_argument('si_package',
                            help="file location of the SI package",
                            type=argparse.FileType('r'))
     parser_si.set_defaults(func=consume_si)
+
+    # dtd check
+    parser_dtd = subparsers.add_parser('dtd-check',
+                                       help='check xml.orig against its DTD and list any errors')
+    parser_dtd.add_argument('-f', '--format-ariespull', action='store_true',
+                            help="format output in a way that's easy to incorporate"
+                            "with an ariesPull error string")
+    parser_dtd.set_defaults(func=check_for_dtd_error)
 
     args = parser.parse_args()
     if args.logging_level:
