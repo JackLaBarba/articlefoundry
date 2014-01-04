@@ -352,36 +352,3 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
                                [adding[i] for i in xrange(len(adding)) if not adding_match_mask[i]],
                                matching_level+1, partial_completion)
 
-
-def get_fig_file_mv_list(doi, fig_links_dict):
-    mv_files = []
-    taken_ordinals = []
-    striking_image_found = False
-    for label, link in fig_links_dict.iteritems():
-        ordinal_matches = re.findall(r'\d{1,4}', label)
-        if 'strikingimage' in label:
-            if striking_image_found:
-                logger.error("Found multiple figures identified as "
-                             "'striking'.  Ignoring '%s'" %
-                             label)
-                continue
-            striking_image_found = True
-            new_name = "%s.strk.tif" % doi
-            mv_files.append((link, new_name))
-        if ordinal_matches:
-            ordinal = ordinal_matches[-1]
-            if ordinal in taken_ordinals:
-                logger.error("Found two figure labels with number, %s. "
-                             "Failing to rename further occurrences." %
-                             ordinal)
-                continue
-            else:
-                taken_ordinals.append(ordinal)
-        if not ordinal_matches:
-            logger.error("Unable to determine figure number from label, '%s'. "
-                         "Figure file not renamed" % label)
-            continue
-        new_name = "%s.g%s.tif" % (doi, ordinal.zfill(3))
-        mv_files.append((link, new_name))
-
-    return mv_files

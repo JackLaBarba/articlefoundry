@@ -193,11 +193,11 @@ class Article(object):
 
     def list_package_si_assets(self):
         files = []
-        for f in self.zip_file.zipfile.filelist:
+        for f in self.zip_file.zipfile.namelist():
             if re.match("%s\.s\d{3}\." % self.doi,
-                        f.filename, re.IGNORECASE):
-                files.append(f.filename)
-        return sorted(files, key=lambda x: x.get('label'))
+                        f, re.IGNORECASE):
+                files.append(f)
+        return sorted(files)
 
     def list_expected_fig_assets(self):
         if not self.xml_orig_obj:

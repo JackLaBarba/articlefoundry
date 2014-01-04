@@ -3,7 +3,6 @@ import os
 import unittest
 from articlefoundry import Article, MetadataPackage
 import logging
-import articlefoundry.logging_config  # noqa
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +22,7 @@ class TestArticle(unittest.TestCase):
 
     def test_list_expected_fig_assets(self):
         logger.debug("Expected fig assets: %s" % self.a.list_expected_fig_assets())
-
+        
     def test_list_expected_si_assets(self):
         logger.debug("Expected si assets: %s" % self.a.list_expected_si_assets())
 
@@ -38,7 +37,7 @@ class TestArticle(unittest.TestCase):
 
     def test_consume_si_package(self):
         self.a.consume_si_package(self.m)
-
+        self.a.close()
 
 class TestMetadataPackage(unittest.TestCase):
 
