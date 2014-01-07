@@ -4,7 +4,6 @@ import lxml
 from lxml import etree
 
 import logging
-import articlefoundry.logging_config  # noqa
 logger = logging.getLogger(__name__)
 
 import unittest

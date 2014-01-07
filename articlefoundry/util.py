@@ -71,7 +71,7 @@ def download_file(url, local):
 
 
 class CustomResolver(etree.Resolver):
-    cache = os.path.abspath('dtd-cache')
+    cache = os.path.abspath(os.path.join(os.path.dirname(__file__), 'dtd-cache'))
     last_url = None
 
     def resolve(self, URL, id, context):
