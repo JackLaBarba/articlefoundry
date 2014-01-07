@@ -1,3 +1,4 @@
+import os
 import argparse
 from article import Article, MetadataPackage
 import logging
@@ -5,7 +6,11 @@ logging.basicConfig(level=logging.DEBUG,
                     format=("%(levelname)-8s "
                             "%(message)s"))
 logging.getLogger('').setLevel(logging.ERROR)
+logger = logging.getLogger(__name__)
 
+from api import AIapi
+
+SI_DIR = os.path.abspath("/var/local/delivery/")
 
 def get_pdf_page_count(args):
     a = Article(archive_file=args.article_file.name)
@@ -13,7 +18,18 @@ def get_pdf_page_count(args):
 
 def consume_si(args):
     a = Article(archive_file=args.article_file.name)
-    si = MetadataPackage(archive_file=args.si_package.name)
+    if args.si_package:
+        si = MetadataPackage(archive_file=args.si_package.name)
+    else:
+        logger.debug("No metadata package provided in call, trying to find one in AI ...")
+        with AIapi() as ai:
+            si_guid = ai.get_si_guid(a.doi)
+        try:
+            si_filename = os.path.join(SI_DIR, "%s.zip" % si_guid)
+            si = MetadataPackage(archive_file=si_filename)
+        except IOError, e:
+            raise IOError("Can't find metadata package for %s at %s" %
+                          (a.doi, si_filename))
     a.consume_si_package(si)
     a.close()
 
@@ -45,8 +61,9 @@ def parse_call():
     # si consume
     parser_si = subparsers.add_parser('consume-si',
                                        help='merge in SI files found in an external .zip')
-    parser_si.add_argument('si_package',
-                           help="file location of the SI package",
+    parser_si.add_argument('-s', '--si_package', nargs=1,
+                           help="specify file location of the SI package, "
+                                "otherwise will default to AI's stored si_guid",
                            type=argparse.FileType('r'))
     parser_si.set_defaults(func=consume_si)
 
