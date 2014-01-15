@@ -1,31 +1,22 @@
 import os
 import shutil
 
-import unittest
+from filetestcase import FileTestCase
 from articlefoundry import Article, MetadataPackage
 import logging
 
 logger = logging.getLogger(__name__)
 
 
-class TestArticle(unittest.TestCase):
+class TestArticle(FileTestCase):
     
     def setUp(self):
-        test_zip = os.path.join(os.path.split(__file__)[0], 'pone.0077196.zip')
-        shutil.copy(test_zip,
-                    os.path.join(os.path.split(__file__)[0], 'pone.007196.zip-bu'))
+        self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
+        test_zip = self.backup_file('pone.0077196.zip')
         self.a = Article(test_zip, new_cw_file=True, read_only=True)
 
-        test_zip = os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip')
-        shutil.copy(test_zip,
-                    os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip-bu'))
+        test_zip = self.backup_file('pone_009486b4-32e4-4646-9249-9244544b8719.zip')
         self.m = MetadataPackage(test_zip)
-
-    def tearDown(self):
-        shutil.move(os.path.join(os.path.split(__file__)[0], 'pone.007196.zip-bu'),
-                    'pone.007196.zip')
-        shutil.move(os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip-bu'),
-                    'pone_009486b4-32e4-4646-9249-9244544b8719.zip')
 
     #TODO Add assertions
     def test_get_pagecount(self):
@@ -53,10 +44,11 @@ class TestArticle(unittest.TestCase):
     def test_check_for_dtd_error(self):
         logger.debug(self.a.check_for_dtd_error())
 
-class TestMetadataPackage(unittest.TestCase):
+class TestMetadataPackage(FileTestCase):
 
     def setUp(self):
-        test_zip = os.path.join(os.path.split(__file__)[0], 'pone_3b1d8099-ae81-4fd3-8c72-5ca741bb39d9.zip')
+        self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
+        test_zip = self.backup_file('pone_3b1d8099-ae81-4fd3-8c72-5ca741bb39d9.zip')
         self.m = MetadataPackage(test_zip)
 
     def test_parsing(self):
@@ -66,10 +58,11 @@ class TestMetadataPackage(unittest.TestCase):
         self.assertEqual(self.m.get_doi().long, "10.1371/journal.pone.0074265")
 
 
-class TestMetadataPackageSI(unittest.TestCase):
+class TestMetadataPackageSI(FileTestCase):
 
     def setUp(self):
-        test_zip = os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip')
+        self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
+        test_zip = self.backup_file('pone_009486b4-32e4-4646-9249-9244544b8719.zip')
         self.m = MetadataPackage(test_zip)
 
     def test_parsing(self):

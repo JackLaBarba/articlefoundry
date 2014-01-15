@@ -1,7 +1,7 @@
 import os
 import shutil
 
-import unittest
+from filetestcase import FileTestCase
 from articlefoundry import Article
 from articlefoundry.mzipfile import ArchiveFile
 
@@ -11,22 +11,12 @@ logging.basicConfig(level=logging.DEBUG,
                             "%(message)s"))
 logger = logging.getLogger(__name__)
 
-class TestArticleArchiveFile(unittest.TestCase):
+class TestArticleArchiveFile(FileTestCase):
 
     def setUp(self):
-        self.origin_test_zip = os.path.join(os.path.split(__file__)[0],
-                                            'pone.0070111.zip')
-        shutil.copy(self.origin_test_zip, os.path.join(os.path.split(__file__)[0],
-                                                       'pone.0070111.zip-bu'))
-        print self.origin_test_zip
+        self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
+        self.origin_test_zip = self.backup_file('pone.0070111.zip')
         self.aaf = ArchiveFile(self.origin_test_zip)
-
-    def tearDown(self):
-        if self.aaf.unzipped:
-            self.aaf.close()
-
-        shutil.move(os.path.join(os.path.split(__file__)[0],
-                    'pone.0070111.zip-bu'), self.origin_test_zip)
 
     def test_open(self):
         self.aaf.unzip()
