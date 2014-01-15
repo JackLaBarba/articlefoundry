@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import unittest
 from articlefoundry import Article, MetadataPackage
@@ -11,10 +12,20 @@ class TestArticle(unittest.TestCase):
     
     def setUp(self):
         test_zip = os.path.join(os.path.split(__file__)[0], 'pone.0077196.zip')
-        self.a = Article(test_zip, new_cw_file=True)
+        shutil.copy(test_zip,
+                    os.path.join(os.path.split(__file__)[0], 'pone.007196.zip-bu'))
+        self.a = Article(test_zip, new_cw_file=True, read_only=True)
 
         test_zip = os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip')
+        shutil.copy(test_zip,
+                    os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip-bu'))
         self.m = MetadataPackage(test_zip)
+
+    def tearDown(self):
+        shutil.move(os.path.join(os.path.split(__file__)[0], 'pone.007196.zip-bu'),
+                    'pone.007196.zip')
+        shutil.move(os.path.join(os.path.split(__file__)[0], 'pone_009486b4-32e4-4646-9249-9244544b8719.zip-bu'),
+                    'pone_009486b4-32e4-4646-9249-9244544b8719.zip')
 
     #TODO Add assertions
     def test_get_pagecount(self):

@@ -125,7 +125,7 @@ class PLOSDoi(object):
         else:
             raise ValueError("Couldn't parse doi %s" % doi_str)
 
-        logger.debug("Constructed Doi object with shortform doi: %s" % self._short_doi)
+        logger.debug("Constructed Doi object with short-form doi: %s" % self._short_doi)
 
     def __cmp__(self, other):
         return (self._short_doi == other)
@@ -147,14 +147,22 @@ class XMLObject(object):
     self_ref_name = None
 
     def __init__(self, xml_file):
+        xml_file.seek(0)
         xml = xml_file.read()
+        print(xml_file, ": ", xml[:300])
         try:
-            self.root = etree.XML(xml, XMLObject.get_parser())
+            main_parser = XMLObject.get_parser()
+            self.root = etree.XML(xml, main_parser)
         except (etree.XMLSyntaxError, ValueError), e:
             logger.debug("Unable to parse %s due to the following syntax error: %s" %
                            (xml_file, unicode(e)))
             logger.debug("Falling back to more relaxed parser ...")
-            self.root = etree.XML(xml, XMLObject.get_fallback_parser())
+            fallback_parser = XMLObject.get_fallback_parser()
+            try:
+                self.root = etree.XML(xml, fallback_parser)
+            except etree.XMLSyntaxError, ee:
+                logger.error("Unable to parse XML file, %s: %s" % (xml_file, ee))
+                raise
 
         logger.debug("Root: %s" % self.root)
         self.self_ref_name = "XML document"
