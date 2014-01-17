@@ -4,7 +4,7 @@ import re
 from lxml import etree
 
 import util
-from mzipfile import MZipFile
+from mzipfile import ArchiveFile
 
 import logging
 logging.basicConfig(level=logging.DEBUG,
@@ -21,14 +21,14 @@ class MetadataPackage(object):
     _metadata_file = None
     _zip_filename = None
 
-    _zip_file = None
+    _archive_file = None
     goxml = None
     metadata = None
 
     def __init__(self, archive_file):
         try:
             logger.debug("Attempting to open file, %s ..." % archive_file)
-            self._zip_file = MZipFile(archive_file)
+            self._archive_file = ArchiveFile(archive_file)
         except IOError, e:
             logger.error(e)
             raise e
@@ -61,7 +61,7 @@ class MetadataPackage(object):
             self._parse_goxml()
         metadata_filename = self.goxml.get_metadata_filename()
         try:
-            self._metadata_file = self._zip_file.zipfile.open(metadata_filename)
+            self._metadata_file = self._archive_file.get(metadata_filename)
         except KeyError, e:
             logger.error("Archive is missing %s" % metadata_filename)
             raise e
@@ -101,15 +101,17 @@ class MetadataPackage(object):
 
 
 class Article(object):
+    read_only = False
     doi = None
     # xml trees
     xml_orig_obj = None
     # file streams
-    zip_file = None
+    archive_file = None
     xml_orig_file = None
     pdf_file = None
 
-    def __init__(self, archive_file=None, doi=None, new_cw_file=False):
+    def __init__(self, archive_file=None, doi=None, new_cw_file=False, read_only=False):
+        self.read_only = read_only
         if archive_file:
             self.create_from_archive(archive_file, new_cw_file)
         elif doi:
@@ -131,14 +133,14 @@ class Article(object):
         # Open zip file
         try:
             logger.debug("Attempting to open file, %s ..." % archive_file)
-            self.zip_file = MZipFile(archive_file)
+            self.archive_file = ArchiveFile(archive_file, read_only=self.read_only)
             self._zip_filename = archive_file
         except IOError, e:
             logger.error(e)
             return None
 
         if new_cw_file:
-            self.zip_file.mv([('%s.xml' % self.doi, '%s.xml.orig' % self.doi)])
+            self.archive_file.rename('%s.xml' % self.doi, '%s.xml.orig' % self.doi)
 
     def __repr__(self):
         return self._zip_filename
@@ -150,16 +152,16 @@ class Article(object):
         # del file objects
         if self.xml_orig_file:
             del self.xml_orig_file
-        if self.zip_file:
-            del self.zip_file
+        if self.archive_file:
+            del self.archive_file
         if self.pdf_file:
             del self.pdf_file
 
     def close(self):
         if self.xml_orig_file:
             self.xml_orig_file.close()
-        if self.zip_file:
-            self.zip_file.close()
+        if self.archive_file:
+            self.archive_file.close()
         if self.pdf_file:
             self.pdf_file.close()
 
@@ -167,7 +169,7 @@ class Article(object):
         # Identify xml.orig
         orig_filename = "%s.xml.orig" % self.doi
         try:
-            self.xml_orig_file = self.zip_file.zipfile.open(orig_filename)
+            self.xml_orig_file = self.archive_file.get(orig_filename)
         except KeyError, e:
             logger.error("Archive is missing %s" % orig_filename)
             raise e
@@ -181,11 +183,11 @@ class Article(object):
         self.xml_orig_obj = util.ArticleXMLObject(self.xml_orig_file)
 
     def open_pdf(self):
-        self.pdf_file = self.zip_file.zipfile.open("%s.pdf" % self.doi)
+        self.pdf_file = self.archive_file.get("%s.pdf" % self.doi)
 
     def list_package_fig_assets(self):
         files = []
-        for f in self.zip_file.zipfile.filelist:
+        for f in self.archive_file.zipfile.filelist:
             if re.match("%s\.g\d{3}\.tif" % self.doi,
                         f.filename, re.IGNORECASE):
                 files.append(f.filename)
@@ -193,7 +195,7 @@ class Article(object):
 
     def list_package_si_assets(self):
         files = []
-        for f in self.zip_file.zipfile.namelist():
+        for f in self.archive_file.list():
             if re.match("%s\.s\d{3}\." % self.doi,
                         f, re.IGNORECASE):
                 files.append(f)
@@ -244,7 +246,7 @@ class Article(object):
         for asset in asset_zipper:
             logger.info("Inserting %s -> %s ..." %
                       (asset['new']['link'], asset['expected']['link']))
-            self.zip_file.add(mdpack._zip_file.get(asset['new']['link']),
+            self.archive_file.add(mdpack._archive_file.get(asset['new']['link']),
                               asset['expected']['link'])
 
         logger.info("Inserted %s file(s) into %s" %

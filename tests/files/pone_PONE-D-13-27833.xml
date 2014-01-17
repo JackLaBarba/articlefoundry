@@ -1,0 +1,500 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE article SYSTEM "archivearticle3.dtd">
+<article dtd-version="3.0" article-type="Research Article">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="publisher">pone</journal-id>
+      <journal-id journal-id-type="email">plosone@plos.org</journal-id>
+      <journal-title-group>
+        <journal-title>PLOS ONE</journal-title>
+      </journal-title-group>
+      <issn pub-type="ppub">1932-6203</issn>
+      <issn pub-type="epub"></issn>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="publisher-id">PONE-D-13-27833</article-id>
+      <article-id pub-id-type="manuscript">PONE-D-13-27833</article-id>
+      <article-id pub-id-type="doi">10.1371/journal.pone.0074265</article-id>
+      <article-categories>
+        <subj-group subj-group-type="Article Type">
+          <subject>Research Article</subject>
+        </subj-group>
+        <subj-group subj-group-type="Category">
+          <subject>Other</subject>
+        </subj-group>
+        <subj-group subj-group-type="Classification">
+          <subject>Biology</subject>
+          <subj-group>
+            <subject>Ecology</subject>
+            <subj-group>
+              <subject>Community ecology</subject>
+              <subj-group>
+                <subject>Community structure</subject>
+              </subj-group>
+            </subj-group>
+            <subj-group>
+              <subject>Ecological metrics</subject>
+              <subj-group>
+                <subject>Relative abundance distribution</subject>
+              </subj-group>
+            </subj-group>
+            <subj-group>
+              <subject>Biodiversity</subject>
+              <subject>Coastal ecology</subject>
+              <subject>Marine ecology</subject>
+            </subj-group>
+          </subj-group>
+          <subj-group>
+            <subject>Evolutionary biology</subject>
+            <subj-group>
+              <subject>Evolutionary systematics</subject>
+              <subj-group>
+                <subject>Taxonomy</subject>
+                <subj-group>
+                  <subject>Microbial taxonomy</subject>
+                </subj-group>
+              </subj-group>
+            </subj-group>
+          </subj-group>
+          <subj-group>
+            <subject>Genomics</subject>
+            <subj-group>
+              <subject>Metagenomics</subject>
+            </subj-group>
+          </subj-group>
+          <subj-group>
+            <subject>Microbiology</subject>
+            <subj-group>
+              <subject>Bacteriology</subject>
+              <subj-group>
+                <subject>Bacterial taxonomy</subject>
+              </subj-group>
+            </subj-group>
+            <subj-group>
+              <subject>Microbial ecology</subject>
+            </subj-group>
+          </subj-group>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Shifts in the Microbial Community Composition of Gulf Coast Beaches following Beach Oiling</article-title>
+        <alt-title alt-title-type="running-head">Oil Impact on Beach Bacterial Communities</alt-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author" corresp="yes">
+          <role content-type="2" />
+          <name>
+            <surname>Newton</surname>
+            <given-names>Ryan</given-names>
+            <prefix>Dr.</prefix>
+          </name>
+          <degrees>Ph.D.</degrees>
+          <email>rjnewton@gmail.com;newtonr@uwm.edu</email>
+          <xref ref-type="aff" rid="aff1" />
+        </contrib>
+        <contrib contrib-type="author">
+          <role content-type="3" />
+          <name>
+            <surname>Huse</surname>
+            <given-names>Susan M</given-names>
+          </name>
+          <email>susan_huse@brown.edu</email>
+          <xref ref-type="aff" rid="aff2" />
+        </contrib>
+        <contrib contrib-type="author">
+          <role content-type="5" />
+          <name>
+            <surname>Morrison</surname>
+            <given-names>Hilary G</given-names>
+          </name>
+          <email>hmorrison1981@gmail.com</email>
+          <xref ref-type="aff" rid="aff3" />
+        </contrib>
+        <contrib contrib-type="author">
+          <role content-type="6" />
+          <name>
+            <surname>Peake</surname>
+            <given-names>Colin S</given-names>
+          </name>
+          <email>cspeake@huskers.unl.edu</email>
+          <xref ref-type="aff" rid="aff4" />
+        </contrib>
+        <contrib contrib-type="author">
+          <role content-type="7" />
+          <name>
+            <surname>Sogin</surname>
+            <given-names>Mitchell L</given-names>
+          </name>
+          <email>sogin@mbl.edu</email>
+          <xref ref-type="aff" rid="aff5" />
+        </contrib>
+        <contrib contrib-type="author">
+          <role content-type="8" />
+          <name>
+            <surname>McLellan</surname>
+            <given-names>Sandra L</given-names>
+          </name>
+          <email>mclellan@uwm.edu</email>
+          <xref ref-type="aff" rid="aff6" />
+        </contrib>
+        <contrib contrib-type="editor">
+          <name>
+            <surname>Gilbert</surname>
+            <given-names>Jack Anthony</given-names>
+          </name>
+          <degrees>Ph.D.</degrees>
+          <email>gilbertjack@gmail.com</email>
+          <role>Academic Editor</role>
+          <xref ref-type="aff" rid="aff7" />
+        </contrib>
+        <aff id="aff1">
+          <institution>University of Wisconsin-Milwaukee</institution>
+          <institution content-type="dept">Great Lakes WATER Institute</institution>
+          <addr-line content-type="addrline1">600 E. Greenfield Ave.</addr-line>
+          <country>UNITED STATES</country>
+          <addr-line content-type="city">Milwaukee</addr-line>
+          <addr-line content-type="state">WI</addr-line>
+          <addr-line content-type="zipcode">53204</addr-line>
+          <phone content-type="primary">414-382-1747</phone>
+        </aff>
+        <aff id="aff2">
+          <institution>Brown University</institution>
+          <institution content-type="dept">Department of Pathology and Laboratory Medicine</institution>
+          <country>UNITED STATES</country>
+          <addr-line content-type="city">Providence</addr-line>
+          <addr-line content-type="state">RI</addr-line>
+          <addr-line content-type="zipcode">02912</addr-line>
+        </aff>
+        <aff id="aff3">
+          <institution>Marine Biological Laboratory</institution>
+          <institution content-type="dept">Josephine Bay Paul Center</institution>
+          <country>UNITED STATES</country>
+          <addr-line content-type="city">Woods Hole</addr-line>
+          <addr-line content-type="state">MA</addr-line>
+          <addr-line content-type="zipcode">02543</addr-line>
+        </aff>
+        <aff id="aff4">
+          <institution>University of Nebraska-Lincoln</institution>
+          <institution content-type="dept">School of Natural Sciences</institution>
+          <country>UNITED STATES</country>
+          <addr-line content-type="city">Lincoln</addr-line>
+          <addr-line content-type="state">NE</addr-line>
+          <addr-line content-type="zipcode">68588</addr-line>
+        </aff>
+        <aff id="aff5">
+          <institution>Marine Biological Laboratory</institution>
+          <institution content-type="dept">Josephine Bay Paul Center</institution>
+          <country>UNITED STATES</country>
+          <addr-line content-type="city">Woods Hole</addr-line>
+          <addr-line content-type="state">MA</addr-line>
+          <addr-line content-type="zipcode">02543</addr-line>
+        </aff>
+        <aff id="aff6">
+          <institution>University of Wisconsin-Milwaukee</institution>
+          <institution content-type="dept">School of Freshwater Sciences, Great Lakes WATER Institute</institution>
+          <country>UNITED STATES</country>
+          <addr-line content-type="city">Milwaukee</addr-line>
+          <addr-line content-type="state">WI</addr-line>
+          <addr-line content-type="zipcode">53204</addr-line>
+        </aff>
+        <aff id="aff7">
+          <institution>Argonne National Laboratory</institution>
+          <institution content-type="dept">Biosciences</institution>
+          <addr-line content-type="addrline1">9700 South Cass Avenue</addr-line>
+          <addr-line content-type="addrline2"> </addr-line>
+          <country>UNITED STATES</country>
+          <addr-line content-type="city">Argonne</addr-line>
+          <addr-line content-type="state">ILLINOIS</addr-line>
+          <addr-line content-type="zipcode">60430</addr-line>
+        </aff>
+      </contrib-group>
+      <pub-date pub-type="ppub">
+        <day>10</day>
+        <month>9</month>
+        <year>2013</year>
+      </pub-date>
+      <pub-date pub-type="epub">
+        <day>10</day>
+        <month>9</month>
+        <year>2013</year>
+      </pub-date>
+      <volume>8</volume>
+      <issue>9</issue>
+      <history>
+        <date date-type="received">
+          <day>05</day>
+          <month>07</month>
+          <year>2013</year>
+        </date>
+        <date date-type="accepted">
+          <day>23</day>
+          <month>07</month>
+          <year>2013</year>
+        </date>
+      </history>
+      <abstract>
+        <p>Microorganisms associated with coastal sands serve as a natural biofilter, providing essential nutrient recycling in nearshore environments and acting to maintain coastal ecosystem health.  Anthropogenic stressors often impact these ecosystems, but little is known about whether these disturbances can be identified through microbial community change. The blowout of the Macondo Prospect reservoir on April 20, 2010, which released oil hydrocarbons into the Gulf of Mexico, presented an opportunity to examine whether microbial community composition might provide a sensitive measure of ecosystem disturbance. Samples were collected on four occasions, beginning in mid-June, during initial beach oiling, until mid-November from surface sand and surf zone waters at seven beaches stretching from Bay St. Louis, MS to St. George Island, FL USA. Oil hydrocarbon measurements and NOAA shoreline assessments indicated little to no impact on the two most eastern beaches (controls).  Sequence comparisons of bacterial ribosomal RNA gene hypervariable regions isolated from beach sands located to the east and west of Mobile Bay in Alabama demonstrated that regional drivers account for markedly different bacterial communities.  Individual beaches had unique community signatures that persisted over time and exhibited spatial relationships, where community similarity decreased as horizontal distance between samples increased from one to hundreds of meters.  In contrast, sequence analyses detected larger temporal and less spatial variation among the water samples.  Superimposed upon these beach community distance and time relationships, was increased variability in bacterial community composition from oil hydrocarbon contaminated sands.  The increased variability was observed among the core, resident, and transient community members, indicating the occurrence of community-wide impacts rather than solely an overprinting of oil hydrocarbon-degrading bacteria onto otherwise relatively stable sand population structures.  Among sequences classified to genus, Alcanivorax, Alteromonas, Marinobacter, Winogradskyella, and Zeaxanthinibacter exhibited the largest relative abundance increases in oiled sands.</p>
+      </abstract>
+      <kwd-group>
+        <kwd>Beach</kwd>
+        <kwd>Sand</kwd>
+        <kwd>Gulf of Mexico</kwd>
+        <kwd>disturbance</kwd>
+        <kwd>bacterial community</kwd>
+        <kwd>Deepwater Horizon</kwd>
+        <kwd>oil spill</kwd>
+        <kwd>Coastal Ocean</kwd>
+      </kwd-group>
+      <counts>
+        <fig-count count="0" />
+      </counts>
+      <custom-meta-group>
+        <custom-meta id="conflict">
+          <meta-name>&lt;strong&gt;Competing Interest&lt;/strong&gt;&lt;br /&gt;
+For yourself and on behalf of all the authors of this manuscript, please declare below any competing interests as described in the "&lt;a href="http://www.plosone.org/static/competing.action" target="_blank"&gt;PLoS Policy on Declaration and Evaluation of Competing Interests&lt;/a&gt;." &lt;br /&gt;&lt;br /&gt;
+
+You are responsible for recognizing and disclosing on behalf of all authors any competing interest that could be perceived to bias their work, acknowledging all financial support and any other relevant financial or competing interests.&lt;br /&gt;&lt;br /&gt;
+
+If no competing interests exist, enter: "&lt;span style="font:10pt monospace;"&gt;The authors have declared that no competing interests exist.&lt;/span&gt;"&lt;br /&gt;&lt;br /&gt;
+
+If you have competing interests to declare, please fill out the text box completing the following statement: "&lt;span style="font:10pt monospace;"&gt;I have read the journal's policy and have the following conflicts&lt;/span&gt;"&lt;br /&gt;&lt;br /&gt;
+
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>The authors have declared that no competing interests exist.</meta-value>
+        </custom-meta>
+        <custom-meta id="financial-disclosure">
+          <meta-name>&lt;strong&gt;Financial Disclosure&lt;/strong&gt;&lt;br /&gt;
+Describe the sources of funding that have supported the work. Please include relevant grant numbers and the URL of any funder's website. Please also include this sentence: "&lt;span style="font:10pt monospace;"&gt;The funders had no role in study design, data collection and analysis, decision to publish, or preparation of the manuscript.&lt;/span&gt;" If this statement is not correct, you must describe the role of any sponsors or funders and amend the aforementioned sentence as needed.&lt;br /&gt;&lt;br /&gt;
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>Financial support for this work was provided by the University of Wisconsin-Milwaukee National Institute of Environmental Health Sciences program, grant ES-004184 to SLM and the Alfred P. Sloan Foundation's grant for the Rare Biosphere in the Built Environment MLS. The funders had no role in study design, data collection and analysis, decision to publish, or preparation of the manuscript.  </meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;New Species&lt;/strong&gt;&lt;br /&gt;
+If your manuscript describes a new taxon, please enter its name below.</meta-name>
+          <meta-value>N/A</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Dual Publication&lt;/strong&gt;&lt;br /&gt;
+Have the results/data/figures in this manuscript been published or are they under consideration for publication elsewhere?&lt;br /&gt;&lt;br /&gt;
+
+A &lt;strong&gt;No&lt;/strong&gt; response indicates that the results/data/figures in this manuscript have not been published elsewhere, nor are they under consideration (from you or one of your Contributing Authors) by another publisher.&lt;br /&gt;&lt;br /&gt;
+
+A &lt;strong&gt;Yes&lt;/strong&gt; response indicates that some portion of the results/data/figures in this manuscript have been published or are under consideration for publication elsewhere.&lt;br /&gt;&lt;br /&gt;
+
+Please enter "&lt;span style="font:10pt monospace;"&gt;Yes&lt;/span&gt;" or "&lt;span style="font:10pt monospace;"&gt;No&lt;/span&gt;" in the box below. If "&lt;span style="font:10pt monospace;"&gt;Yes&lt;/span&gt;," please identify results/data/figures taken from other published/pending manuscripts in the text box below and explain why this does not constitute dual publication.</meta-name>
+          <meta-value>No</meta-value>
+        </custom-meta>
+        <custom-meta id="copyright-statement">
+          <meta-name>&lt;strong&gt;Government Employee&lt;/strong&gt;&lt;br /&gt;
+Are you or any author on this manuscript an employee of the United States government, requiring that this work appear in the public domain?&lt;br /&gt;&lt;br /&gt;
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>No - I am not an employee of the United States government</meta-value>
+        </custom-meta>
+        <custom-meta id="contrib-conceived">
+          <meta-name>&lt;strong&gt;Author Contributions: conceived and designed the experiments&lt;/strong&gt;&lt;br /&gt;
+Please enter the initials of each author who conceived and designed the experiments for this manuscript separated by a space.&lt;br /&gt;&lt;br /&gt;
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>RJN SLM CSP</meta-value>
+        </custom-meta>
+        <custom-meta id="contrib-performed">
+          <meta-name>&lt;strong&gt;Author Contributions: performed the experiments&lt;/strong&gt;&lt;br /&gt;
+Please enter the initials of each author who performed the experiments for this manuscript separated by a space.&lt;br /&gt;&lt;br /&gt;
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>RJN SMH HGM CSP</meta-value>
+        </custom-meta>
+        <custom-meta id="contrib-analyzed">
+          <meta-name>&lt;strong&gt;Author Contributions: analyzed the data&lt;/strong&gt;&lt;br /&gt;
+Please enter the initials of each author who analyzed the data for this manuscript separated by a space.&lt;br /&gt;&lt;br /&gt;
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>RJN CSP MLS SLM</meta-value>
+        </custom-meta>
+        <custom-meta id="contrib-contributed">
+          <meta-name>&lt;strong&gt;Author Contributions: contributed reagents/materials/analysis tools&lt;/strong&gt;&lt;br /&gt;
+Please enter the initials of each author who contributed reagents/materials/analysis tools for this manuscript separated by a space.&lt;br /&gt;&lt;br /&gt;
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>SMH MLS SLM</meta-value>
+        </custom-meta>
+        <custom-meta id="contrib-wrote">
+          <meta-name>&lt;strong&gt;Author Contributions: wrote the manuscript&lt;/strong&gt;&lt;br /&gt;
+Please enter the initials of each author who wrote the manuscript separated by a space.&lt;br /&gt;&lt;br /&gt;
+&lt;span style="color:#B8860B;"&gt;* typeset&lt;/span&gt;</meta-name>
+          <meta-value>RJN SMH HGM MLS SLM</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Required Statement&lt;/strong&gt;&lt;br /&gt;
+You must enter your initials to acknowledge your agreement to the following statement.&lt;br /&gt;&lt;br /&gt;
+
+Any related manuscripts in press or submitted elsewhere are mentioned in the cover letter and will be uploaded as supporting information.</meta-name>
+          <meta-value>RJN</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Required Statement&lt;/strong&gt;&lt;br /&gt;
+You must enter your initials to acknowledge your agreement to the following statement.&lt;br /&gt;&lt;br /&gt;
+
+You confirm that all Contributing Authors know of and concur with the submission of this manuscript.</meta-name>
+          <meta-value>RJN</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Required Statement&lt;/strong&gt;&lt;br /&gt;
+You must enter your initials to acknowledge your agreement to the following statement.&lt;br /&gt;&lt;br /&gt;
+
+You confirm that any persons named in the acknowledgments section agree to being so named.</meta-name>
+          <meta-value>RJN</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Required Statement&lt;/strong&gt;&lt;br /&gt;
+You must enter your initials to acknowledge your agreement to the following statement.&lt;br /&gt;&lt;br /&gt;
+
+We strongly encourage adherence to appropriate reporting guidelines (e.g. &lt;a href="http://www.consort-statement.org/" target="_blank"&gt;CONSORT&lt;/a&gt;, &lt;a href="http://www.mged.org/Workgroups/MIAME/miame.html" target="_blank"&gt;MIAME&lt;/a&gt;, &lt;a href="http://www.strobe-statement.org/" target="_blank"&gt;STROBE&lt;/a&gt;, &lt;a href="http://www.prisma-statement.org/" target="_blank"&gt;PRISMA&lt;/a&gt; and other guidelines provided by &lt;a href="http://www.equator-network.org/" target="_blank"&gt;EQUATOR&lt;/a&gt;) and community standards for data availability. Please indicate that you have read our &lt;a href="http://www.plosone.org/static/policies.action#sharing" target="_blank"&gt;Publishing Policies&lt;/a&gt; and that your manuscript adheres to the appropriate standards.</meta-name>
+          <meta-value>RJN</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Direct Billing to Institutions and Funders&lt;/strong&gt;&lt;br /&gt;
+The institutions or funding agencies listed below have agreed to be invoiced directly and cover publication fees in PLoS Journals for their affiliated researchers. If you are a &lt;strong&gt;&lt;em&gt;corresponding author&lt;/em&gt;&lt;/strong&gt; affiliated with one of the organizations listed, please select it. If you are funded by a funding agency or institution but are not affiliated with that agency or institution, please leave this section blank. </meta-name>
+          <meta-value>None</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Institutional Membership Discount&lt;/strong&gt;&lt;br /&gt;
+An author's institution, funding agency, or even country may have an arrangement with PLoS, such as an Institutional Membership, to offset all or part of the publication cost. If you are entitled to the benefits of such an arrangement, your institution or funding agency will be included in the list of organizations below. Please click your institution's or funding agency's name to display the &lt;b&gt;percentage discount&lt;/b&gt; off of the full publication charge. This discount will be calculated for you in the event that your manuscript is accepted for publication.&lt;br /&gt;&lt;br /&gt;
+
+To be eligible for this publication discount you must be the &lt;strong&gt;&lt;em&gt;corresponding author&lt;/em&gt;&lt;/strong&gt; affiliated with the member institution.</meta-name>
+          <meta-value>None</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>&lt;strong&gt;Publication Fees and Global Participation Initiative&lt;/strong&gt;
+&lt;br /&gt;&lt;br /&gt;
+PLOS is committed to the widest possible global participation in open access publishing. To determine the appropriate fee, we use a country-based pricing model, which is based on the country that provides 50% or more of the primary funding for the research that is being submitted. 
+&lt;br /&gt;&lt;br /&gt;
+Research articles funded by Upper Middle and High Income Countries incur our standard publication fees; fees for Low and Lower Middle Income Countries are calculated according to the &lt;a href="http://www.plos.org/about/viewpoints/global-participation-initiative/" target="_blank"&gt;PLOS Global Participation Initiative&lt;/a&gt; pricing program for manuscripts submitted after 9am Pacific Time on September 4, 2012 (this program is not retroactive): 
+&lt;br /&gt;&lt;br /&gt;
+&amp;emsp;I. Upper Middle and High Income Countries
+    &lt;br /&gt;&lt;br /&gt;
+    &amp;emsp;&amp;emsp;These countries will be automatically charged our standard publication fees (no price increases since 2009) as follows:
+    &lt;br /&gt;&lt;br /&gt;
+    &lt;ul &gt;
+    &lt;li&gt;PLOS Biology US$2900 &lt;/li&gt;
+    &lt;li&gt;PLOS Medicine US$2900 &lt;/li&gt;
+    &lt;li&gt;PLOS Computational Biology US$2250 &lt;/li&gt;
+    &lt;li&gt;PLOS Genetics US$2250 &lt;/li&gt;
+    &lt;li&gt;PLOS Pathogens US$2250 &lt;/li&gt;
+    &lt;li&gt;PLOS Neglected Tropical Diseases US$2250 &lt;/li&gt;
+    &lt;li&gt;PLOS ONE US$1350 &lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;br /&gt;
+&amp;emsp;II. Low and Lower Middle Income countries – PLOS Global Participation Initiative
+    &lt;br /&gt;&lt;br /&gt;
+    &amp;emsp;&amp;emsp;Group One: Countries from this &lt;a href="http://www.plos.org/group-one-countries/" target="_blank"&gt;list&lt;/a&gt; will not be charged for publishing
+    &lt;br /&gt;&lt;br /&gt;
+    &amp;emsp;&amp;emsp;Group Two: Countries from this &lt;a href="http://www.plos.org/group-two-countries/" target="_blank"&gt;list&lt;/a&gt; will be charged a flat $500
+    &lt;br /&gt;&lt;br /&gt;
+You will receive an invoice for the appropriate publication fee upon acceptance of your manuscript for publication. We will not invoice manuscripts that qualify for no charge under the Global Participation Initiative.
+&lt;br /&gt;&lt;br /&gt;
+If you have further questions on our country-based pricing model, please review this  &lt;a href="http://www.plos.org/global-participation-initiative-faq/" target="_blank"&gt;FAQ&lt;/a&gt;. 
+&lt;br /&gt;&lt;br /&gt;
+All pricing programs are subject to change. 
+&lt;br /&gt;&lt;br /&gt;
+
+&lt;hr size="6" NOSHADE&gt;
+
+
+&lt;strong&gt;Fee Waivers &lt;/strong&gt;
+&lt;br /&gt;&lt;br /&gt;
+Our fee waiver policy, whereby PLOS offers to waive or further reduce the payment required of authors who cannot pay the full amount charged for publication, remains in effect. Editors and reviewers have no access to whether authors are able to pay; decisions to publish are only based on editorial criteria.
+&lt;br /&gt;&lt;br /&gt;
+We will only invoice you when your manuscript is accepted.  At that time you can request a full or partial fee waiver with your explanation for requiring a waiver. We will not invoice manuscripts that qualify for no charge under the &lt;a href="http://www.plos.org/about/viewpoints/global-participation-initiative/" target="_blank"&gt;Global Participation Initiative&lt;/a&gt;.
+&lt;br /&gt;&lt;br /&gt;
+All waiver programs are subject to change.
+&lt;br /&gt;&lt;br /&gt;
+
+&lt;hr size="6" NOSHADE&gt;
+
+
+&lt;strong&gt;Funding Statement&lt;/strong&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;strong&gt; Please tell us from which country the research in this submission is primarily funded&lt;/strong&gt;
+&lt;br /&gt;&lt;br /&gt;
+&lt;strong&gt;Why am I being asked this question?&lt;/strong&gt; PLOS uses country-based pricing to calculate your publication fee. We do this based on the country that you identified as the primary funder for the submission. By this we mean the country that funds the largest proportion of research conducted for this submission; we recognize that this may not be the country that funds the corresponding author. You will receive an invoice for the appropriate publication fee upon acceptance of your manuscript for publication.</meta-name>
+          <meta-value>UNITED STATES</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Black and White Image Count</meta-name>
+          <meta-value>0</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Color Image Count</meta-name>
+          <meta-value>0</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Subscan Notes</meta-name>
+          <meta-value>ACW (AJE), 07/05/13: Subscan Ok to run queue (2).</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Subscan Start</meta-name>
+          <meta-value>Jul 05 2013 12:00AM</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Subscan End</meta-name>
+          <meta-value>Jul 05 2013 12:00AM</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Technical Check version</meta-name>
+          <meta-value>TC1</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Controversial Paper Priority</meta-name>
+          <meta-value>None</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Collections</meta-name>
+          <meta-value>N/A</meta-value>
+        </custom-meta>
+        <custom-meta>
+          <meta-name>Paid Statistical Reviewer - Invited</meta-name>
+          <meta-value>N/A</meta-value>
+        </custom-meta>
+      </custom-meta-group>
+    </article-meta>
+  </front>
+  <body>
+    <fig>
+      <label>Figure 1</label>
+      <graphic xlink:href="Figure1.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </fig>
+    <fig>
+      <label>Figure 2</label>
+      <graphic xlink:href="Figure2.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </fig>
+    <fig>
+      <label>Figure 3</label>
+      <graphic xlink:href="Figure3.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </fig>
+    <fig>
+      <label>Figure 4</label>
+      <graphic xlink:href="Figure4.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </fig>
+    <fig>
+      <label>Figure 5</label>
+      <graphic xlink:href="Figure5.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </fig>
+    <fig>
+      <label>Figure 6</label>
+      <graphic xlink:href="Figure6.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </fig>
+    <fig>
+      <label>Figure 7</label>
+      <graphic xlink:href="Figure7.tif" xmlns:xlink="http://www.w3.org/1999/xlink" />
+    </fig>
+    <supplementary-material xlink:href="Figure S1.tif" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <label>Figure S1</label>
+    </supplementary-material>
+    <supplementary-material xlink:href="STable2_TaxonomyTable.pdf" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <label>Supporting Information Table 2</label>
+    </supplementary-material>
+    <supplementary-material xlink:href="TableS1_Sampling Conditions.pdf" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <label>Table S1</label>
+    </supplementary-material>
+    <supplementary-material xlink:href="TableS2_TaxonomyTable.pdf" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <label>Table S2</label>
+    </supplementary-material>
+  </body>
+</article>

@@ -1,40 +1,46 @@
 import os
 import shutil
 
-import unittest
+from filetestcase import FileTestCase
 from articlefoundry import Article
+from articlefoundry.mzipfile import ArchiveFile
 
-class TestMZipFile(unittest.TestCase):
-    
+import logging
+logging.basicConfig(level=logging.DEBUG,
+                    format=("%(levelname)-8s "
+                            "%(message)s"))
+logger = logging.getLogger(__name__)
+
+class TestArticleArchiveFile(FileTestCase):
+
     def setUp(self):
-        self.origin_test_zip = os.path.join(os.path.split(__file__)[0],
-                                       'pone.0070111.zip')
-        self.test_zip        = os.path.join(os.path.split(__file__)[0],
-                                       'pone.0070111.test.zip')
-        shutil.copyfile(self.origin_test_zip, self.test_zip)
-        self.a = Article(self.test_zip)
+        self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
+        self.origin_test_zip = self.backup_file('pone.0070111.zip')
+        self.aaf = ArchiveFile(self.origin_test_zip)
 
-    def tearDown(self):
-        self.a.close()
-        os.remove(self.test_zip)
+    def test_open(self):
+        self.aaf.unzip()
+        self.assertTrue(os.path.exists(os.path.join('/tmp/' + self.aaf.uuid)),
+                        "Failed to expand zip to tmp")
+        logger.debug("open? %s; uuid = %s" % (self.aaf.unzipped, self.aaf.uuid))
+        self.aaf.close()
+        self.assertFalse(os.path.exists(os.path.join('/tmp/' + self.aaf.uuid)),
+                         "Failed to clean up expanded zip in tmp")
 
-    def test_mv_move(self):
-        new_name = 'lala'
-        self.a.zip_file.mv([('pone.0070111.pdf', new_name)])
-        print self.a.zip_file.zipfile.namelist()
-        self.assertTrue(new_name in self.a.zip_file.zipfile.namelist())
+    def test_list(self):
+        logger.debug(self.aaf.list())
 
-    def test_mv_delete(self):
-        new_name = ''
-        self.a.zip_file.mv([('pone.0070111.pdf', new_name)])
-        print self.a.zip_file.zipfile.namelist()
-        self.assertTrue('pone.0070111.pdf' not in self.a.zip_file.zipfile.namelist())
-        self.assertTrue('' not in self.a.zip_file.zipfile.namelist())        
+    def test_rename(self):
+        self.aaf.unzip()
+        self.aaf.rename('manifest.dtd', 'hotdog')
+        self.assertTrue('hotdog' in self.aaf.list(), "Unable to rename file")
 
-    def test_mv_fake(self):
-        new_name = 'lala'
-        prevlength = len(self.a.zip_file.zipfile.namelist())
-        self.a.zip_file.mv([('pone.0070111.pdfnomatch', new_name)])
-        print self.a.zip_file.zipfile.namelist()
-        self.assertEqual(prevlength, len(self.a.zip_file.zipfile.namelist()))
+    def test_rename_nonexistent(self):
+        self.assertRaises(KeyError, self.aaf.rename, 'not-a-file', 'does not matter')
+
+    def test_remove(self):
+        self.assertTrue(self.aaf.file_exists('manifest.dtd'))
+        self.aaf.remove('manifest.dtd')
+        self.assertFalse(self.aaf.file_exists('manifest.dtd'),
+                         "Failed to remove() file")
 
