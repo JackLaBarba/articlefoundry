@@ -1,0 +1,3 @@
+#!/bin/bash
+
+/var/local/scripts/production/articlefoundry/env/bin/python /var/local/scripts/production/articlefoundry/articlefoundry/articlefoundry/ "$@"
