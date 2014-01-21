@@ -1,4 +1,5 @@
 import os
+import glob
 import shutil
 
 from filetestcase import FileTestCase

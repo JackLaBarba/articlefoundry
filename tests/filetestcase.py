@@ -1,5 +1,6 @@
 import shutil
 import os
+import glob
 
 import unittest
 
@@ -9,6 +10,7 @@ class FileTestCase(unittest.TestCase):
     backed_up_files = []
 
     BACKUP_SUFFIX = 'BU'
+    TMP_GLOB = '/tmp/af_*'
 
     def backup_file(self, filename):
         if not self.test_file_dir:
@@ -31,4 +33,5 @@ class FileTestCase(unittest.TestCase):
 
     def tearDown(self):
         self.restore_all_files()
+        self.assertTrue(len(glob.glob(self.TMP_GLOB)) == 0, "Didn't clean up /tmp/")
         super(FileTestCase, self).tearDown()

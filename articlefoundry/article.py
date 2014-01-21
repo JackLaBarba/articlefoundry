@@ -159,6 +159,7 @@ class Article(object):
             self.archive_file.close()
         if self.pdf_file:
             self.pdf_file.close()
+        self.archive_file.close()
 
     def read_xml_orig(self):
         orig_filename = "%s.xml.orig" % self.doi

@@ -81,8 +81,12 @@ class XMLObject(object):
     def etree_to_string(self):
         etree.tostring(self.root, xml_declaration=True, encoding='UTF-8')
 
-    def etree_to_file(self, filename):
-        etree.write(filename, encoding='utf-8')
+    def etree_to_file(self, filename=None):
+        if filename:
+            etree.write(filename, encoding='utf-8')
+        else:
+            etree.write(self.filename, encoding='utf-8')
+
 
 
 class GOXMLObject(XMLObject):

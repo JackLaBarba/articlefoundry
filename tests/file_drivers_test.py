@@ -18,6 +18,10 @@ class TestArticleArchiveFile(FileTestCase):
         self.origin_test_zip = self.backup_file('pone.0070111.zip')
         self.aaf = ArchiveFile(self.origin_test_zip)
 
+    def tearDown(self):
+        self.aaf.close()
+        super(TestArticleArchiveFile, self).tearDown()
+
     def test_open(self):
         self.aaf.unzip()
         self.assertTrue(os.path.exists(os.path.join('/tmp/' + self.aaf.uuid)),
