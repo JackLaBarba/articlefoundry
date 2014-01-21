@@ -12,9 +12,11 @@ from api import AIapi
 
 SI_DIR = os.path.abspath("/var/local/delivery/")
 
+
 def get_pdf_page_count(args):
     a = Article(archive_file=args.article_file.name)
     print a.get_pdf_page_count()
+
 
 def consume_si(args):
     a = Article(archive_file=args.article_file.name)
@@ -33,6 +35,7 @@ def consume_si(args):
     a.consume_si_package(si)
     a.close()
 
+
 def check_for_dtd_error(args):
     a = Article(archive_file=args.article_file.name)
     error = a.check_for_dtd_error()
@@ -41,6 +44,7 @@ def check_for_dtd_error(args):
             print "error: DTD error: %s" % error
         else:
             print error
+
 
 def parse_call():
     desc = """

@@ -3,7 +3,7 @@ import shutil
 
 from filetestcase import FileTestCase
 from articlefoundry import Article
-from articlefoundry.mzipfile import ArchiveFile
+from articlefoundry.file_drivers import ArchiveFile
 
 import logging
 logging.basicConfig(level=logging.DEBUG,

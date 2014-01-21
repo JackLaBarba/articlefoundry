@@ -3,8 +3,9 @@ import re
 
 from lxml import etree
 
-import util
-from mzipfile import ArchiveFile
+from articlefoundry.file_drivers import ArchiveFile
+from articlefoundry.xml_drivers import GOXMLObject, MetadataXMLObject, NLMXMLObject, XMLObject
+from articlefoundry.util import PLOSDoi, zip_together_assets, get_pdf_page_count
 
 import logging
 logging.basicConfig(level=logging.DEBUG,
@@ -16,12 +17,11 @@ logger = logging.getLogger(__name__)
 class MetadataPackage(object):
     _filename_root = None
     _production_task_id = None
-
-    _goxml_file = None
-    _metadata_file = None
     _zip_filename = None
 
-    _archive_file = None
+    _goxml_filename = None
+    _metadata_filename = None
+
     goxml = None
     metadata = None
 
@@ -34,54 +34,49 @@ class MetadataPackage(object):
             raise e
         self._zip_filename = archive_file
         self._filename_root = os.path.splitext(os.path.basename(archive_file))[0]
-        self._parse_goxml()
-        self._parse_metadata()
 
-    def _open_goxml_file(self):
+    def close(self):
+        self._archive_file.close()
+
+    def _read_goxml(self):
         # Identify go.xml
-
-        goxml_filename = os.path.join(os.path.dirname(self._zip_filename),
+        self._goxml_filename = os.path.join(os.path.dirname(self._zip_filename),
                                       "%s.go.xml" % self._filename_root)
         try:
-            self._goxml_file = open(goxml_filename, 'r')
+            f = open(self._goxml_filename, 'r')
         except KeyError, e:
-            logger.error("Archive is missing %s" % goxml_filename)
+            logger.error("Archive is missing %s" % self._goxml_filename)
             raise e
 
-    def _parse_goxml(self):
-        if not self._goxml_file:
-            self._open_goxml_file()
-        goxml_filename = "%s.go.xml" % self._filename_root
-        logger.debug("Parsing %s ..." % goxml_filename)
-        self.goxml = util.GOXMLObject(self._goxml_file)
+        xml = f.read()
+        f.close()
+        logger.debug("Parsing %s ..." % self._goxml_filename)
+        self.goxml = GOXMLObject(xml)
 
-    def _open_metadata(self):
+    def _read_metadata(self):
         # Identify metadata xml
         if not self.goxml:
-            self._parse_goxml()
-        metadata_filename = self.goxml.get_metadata_filename()
+            self._read_goxml()
+        self._metadata_filename = self.goxml.get_metadata_filename()
         try:
-            self._metadata_file = self._archive_file.get(metadata_filename)
+            f = self._archive_file.get(self._metadata_filename)
         except KeyError, e:
-            logger.error("Archive is missing %s" % metadata_filename)
+            logger.error("Archive is missing %s" % self.metadata_filename)
             raise e
 
-    def _parse_metadata(self):
-        # Parse metadata xml
-        if not self._metadata_file:
-            self._open_metadata()
-        metadata_filename = self.goxml.get_metadata_filename()
-        logger.debug("Parsing %s ..." % metadata_filename)
-        self.metadata = util.MetadataXMLObject(self._metadata_file)
+        xml = f.read()
+        f.close()
+        logger.debug("Parsing %s ..." % self._metadata_filename)
+        self.metadata = MetadataXMLObject(xml)
 
     def get_doi(self):
         if not self.goxml:
-            self._parse_goxml()
+            self._read_goxml()
         return self.goxml.get_doi()
 
     def is_si_export(self):
         if not self.goxml:
-            self._parse_goxml()
+            self._read_goxml()
         return (self.goxml.get_production_task_name() ==
                 "Send Supporting Information Files to PLoS Server")
 
@@ -93,7 +88,7 @@ class MetadataPackage(object):
     def get_si_filenames(self):
         self.verify_si_export()
         if not self.metadata:
-            self._parse_metadata()
+            self._read_metadata()
         return sorted(self.metadata.get_si_links(), key=lambda x: x.get('label'))
     
     def __repr__(self):
@@ -124,7 +119,7 @@ class Article(object):
         logger.debug("Discerning DOI from '%s' ..." % archive_file)
         match = re.match('\w{4}\.\d{7}', os.path.split(archive_file)[1])
         if match:
-            self.doi = util.PLOSDoi(match.group(0))
+            self.doi = PLOSDoi(match.group(0))
             logger.debug("DOI: %s" % self.doi)
         else:
             logger.error("Could not determine doi from filename.")
@@ -165,22 +160,18 @@ class Article(object):
         if self.pdf_file:
             self.pdf_file.close()
 
-    def open_xml_orig(self):
-        # Identify xml.orig
+    def read_xml_orig(self):
         orig_filename = "%s.xml.orig" % self.doi
         try:
-            self.xml_orig_file = self.archive_file.get(orig_filename)
+            f = self.archive_file.get(orig_filename)
         except KeyError, e:
             logger.error("Archive is missing %s" % orig_filename)
             raise e
 
-    def parse_xml_orig(self):
-        # Parse xml.orig
-        if not self.xml_orig_file:
-            self.open_xml_orig()
-        orig_filename = "%s.xml.orig" % self.doi
+        xml = f.read()
+        f.close()
         logger.debug("Parsing %s ..." % orig_filename)
-        self.xml_orig_obj = util.ArticleXMLObject(self.xml_orig_file)
+        self.xml_orig_obj = NLMXMLObject(xml)
 
     def open_pdf(self):
         self.pdf_file = self.archive_file.get("%s.pdf" % self.doi)
@@ -203,13 +194,13 @@ class Article(object):
 
     def list_expected_fig_assets(self):
         if not self.xml_orig_obj:
-            self.parse_xml_orig()
+            self.read_xml_orig()
         return sorted(self.xml_orig_obj.get_fig_links(),
                       key=lambda x: x.get('label'))
 
     def list_expected_si_assets(self):
         if not self.xml_orig_obj:
-            self.parse_xml_orig()
+            self.read_xml_orig()
         return self.xml_orig_obj.get_si_links()
 
     def list_missing_si_assets(self):
@@ -220,13 +211,20 @@ class Article(object):
     def get_pdf_page_count(self):
         if not self.pdf_file:
             self.open_pdf()
-        return util.get_pdf_page_count(byte_stream=self.pdf_file.read())
+        return get_pdf_page_count(byte_stream=self.pdf_file.read())
 
     def check_for_dtd_error(self):
-        if not self.xml_orig_file:
-            self.open_xml_orig()
-        # ensure etree flush first
-        return util.XMLObject.check_for_dtd_error(self.xml_orig_file)
+        orig_filename = "%s.xml.orig" % self.doi
+        try:
+            f = self.archive_file.get(orig_filename)
+        except KeyError, e:
+            logger.error("Archive is missing %s" % orig_filename)
+            raise e
+
+        xml = f.read()
+        f.close()
+        logger.debug("Parsing %s ..." % orig_filename)
+        return XMLObject.check_for_dtd_error(xml)
 
     def consume_si_package(self, mdpack):
         logger.info("Attempting to insert SI files from %s to %s ..."  %
@@ -241,13 +239,13 @@ class Article(object):
         logger.debug("Article expects %s SI file(s): %s" % (len(si_assets), si_assets))
         mdpack_si_assets = mdpack.get_si_filenames()
         logger.debug("SI package contains %s SI file(s): %s" % (len(mdpack_si_assets), mdpack_si_assets))
-        asset_zipper = util.zip_together_assets(si_assets, mdpack_si_assets)
+        asset_zipper = zip_together_assets(si_assets, mdpack_si_assets)
         asset_zipper.sort(key=lambda x: x['expected']['link'])
         for asset in asset_zipper:
             logger.info("Inserting %s -> %s ..." %
-                      (asset['new']['link'], asset['expected']['link']))
+                        (asset['new']['link'], asset['expected']['link']))
             self.archive_file.add(mdpack._archive_file.get(asset['new']['link']),
-                              asset['expected']['link'])
+                                  asset['expected']['link'])
 
         logger.info("Inserted %s file(s) into %s" %
                     (len(asset_zipper), self))

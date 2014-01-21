@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from filetestcase import FileTestCase
-from articlefoundry.util import *
+from articlefoundry.xml_drivers import *
 
 
 class TestSIFuncs(FileTestCase):
@@ -16,18 +16,19 @@ class TestSIFuncs(FileTestCase):
         self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
         self.meta_filename = self.backup_file('pone_PONE-D-13-27833.xml')
         self.meta_file = file(self.meta_filename)
-        self.meta_xml = MetadataXMLObject(self.meta_file)
+        self.meta_xml = MetadataXMLObject(self.meta_file.read())
 
         self.article_filename = self.backup_file('pone.0070111.xml.orig')
         self.article_file = file(self.article_filename)
-        self.article_xml = ArticleXMLObject(self.article_file)
+        self.article_xml = ArticleXMLObject(self.article_file.read())
 
         self.goxml_filename = self.backup_file('pone_3b1d8099-ae81-4fd3-8c72-5ca741bb39d9.go.xml')
         self.goxml_file = file(self.goxml_filename)
-        self.goxml_xml = GOXMLObject(self.goxml_file)
+        self.goxml_xml = GOXMLObject(self.goxml_file.read())
         
     def test_get_si_links(self):
         logger.debug("SI meta links: %s" % self.meta_xml.get_si_links())
+        self.meta_xml.etree_to_string()
 
     def test_get_fig_links(self):
         logger.debug("FIG links: %s" % self.meta_xml.get_fig_links())
@@ -63,11 +64,11 @@ class TestXMLParsing(FileTestCase):
         self.xml_filename = self.backup_file('pone.0070111-dtd-invalid.xml.orig')
 
     def test_dtd_invalid(self):
-        article_file = file(self.xml_filename)
+        article_file = file(self.xml_filename).read()
         ArticleXMLObject(article_file)
 
     def test_check_for_dtd_error(self):
         article_file = file(self.xml_filename)
-        output = XMLObject.check_for_dtd_error(article_file)
+        output = XMLObject.check_for_dtd_error(article_file.read())
         logger.debug(output)
         assert output

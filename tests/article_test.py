@@ -18,6 +18,11 @@ class TestArticle(FileTestCase):
         test_zip = self.backup_file('pone_009486b4-32e4-4646-9249-9244544b8719.zip')
         self.m = MetadataPackage(test_zip)
 
+    def tearDown(self):
+        self.a.close()
+        self.m.close()
+        super(TestArticle, self).tearDown()
+
     #TODO Add assertions
     def test_get_pagecount(self):
         self.assertEqual(self.a.get_pdf_page_count(), 17)
@@ -51,6 +56,10 @@ class TestMetadataPackage(FileTestCase):
         test_zip = self.backup_file('pone_3b1d8099-ae81-4fd3-8c72-5ca741bb39d9.zip')
         self.m = MetadataPackage(test_zip)
 
+    def tearDown(self):
+        self.m.close()
+        super(TestMetadataPackage, self).tearDown()
+
     def test_parsing(self):
         self.assertEqual(True, True)
 
@@ -64,6 +73,10 @@ class TestMetadataPackageSI(FileTestCase):
         self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
         test_zip = self.backup_file('pone_009486b4-32e4-4646-9249-9244544b8719.zip')
         self.m = MetadataPackage(test_zip)
+
+    def tearDown(self):
+        self.m.close()
+        super(TestMetadataPackageSI, self).tearDown()
 
     def test_parsing(self):
         self.assertEqual(True, True)

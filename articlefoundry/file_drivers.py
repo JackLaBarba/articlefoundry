@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 TEMP = os.path.abspath('/tmp')
 
+
 class ArchiveFile():
     read_only = False
     filename = None
@@ -47,14 +48,14 @@ class ArchiveFile():
 
     def close(self):
         logger.debug("Closing %s ..." % self)
-        temp_zip_location = os.path.join(TEMP, self.uuid + '.zip')
         if self.unzipped:
+            temp_zip_location = os.path.join(TEMP, self.uuid + '.zip')
             if not self.read_only:
                 new_zip = zipfile.ZipFile(temp_zip_location, 'w')
                 logger.debug("Zipping files into temp location, %s ..." % temp_zip_location)
                 for root, dirs, files in os.walk(self.working_dir):
-                    for file in sorted(files, key=lambda s: s.lower()):
-                        new_zip.write(os.path.join(root, file), file)
+                    for f in sorted(files, key=lambda s: s.lower()):
+                        new_zip.write(os.path.join(root, f), f)
                 new_zip.close()
 
                 final_dest = self.filename
@@ -102,6 +103,3 @@ class ArchiveFile():
         with open(self._get_working_filename(filename), 'w') as new_f:
             for line in f:
                 new_f.write(line)
-
-
-

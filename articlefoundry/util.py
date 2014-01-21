@@ -1,9 +1,6 @@
 from __future__ import with_statement
 import re
 import string
-from lxml import etree
-import urlparse
-import os
 import urllib2
 
 import logging
@@ -68,224 +65,6 @@ def download_file(url, local):
     # Open our local file for writing
     with open(local, "wb") as local_file:
         local_file.write(f.read())
-
-
-class CustomResolver(etree.Resolver):
-    cache = os.path.abspath(os.path.join(os.path.dirname(__file__), 'dtd-cache'))
-    last_url = None
-
-    def resolve(self, URL, id, context):
-        logger.debug("Fetching %s ..." % URL)
-        #determine cache path
-        url = urlparse.urlparse(URL)
-        # Handle relative paths for network locations
-        if url.netloc:
-            self.last_url = url
-        else:
-            if not self.last_url:
-                raise ValueError("Invalid URL provided for DTD: %s" % URL)
-            url = urlparse.urlparse(urlparse.urljoin(self.last_url.geturl(), URL))
-
-        local_base_directory = os.path.join(self.cache, url.netloc)
-        local_file = local_base_directory + url.path
-
-        #cache if necessary
-        if not os.path.exists(local_file):
-            if not os.path.exists(os.path.split(local_file)[0]):
-                os.makedirs(os.path.split(local_file)[0])
-            download_file(url.geturl(), local_file)
-
-        #resolve the cached file
-        return self.resolve_file(open(local_file), context, base_url=URL)
-
-
-class PLOSDoi(object):
-    RE_SHORT_DOI_PATTERN = "[a-z]*\.[0-9]*"
-
-    _short_doi = None
-
-    def __init__(self, doi_str):
-        self._pub_prefix = "10.1371/journal."
-
-        short_form_match = re.compile(self.RE_SHORT_DOI_PATTERN)
-        long_form_match = re.compile('(?<=10\.1371/journal\.)%s' %
-                                     self.RE_SHORT_DOI_PATTERN)
-        ambra_doi_match = re.compile('^(?<=info\:doi/10\.1371/journal\.)%s$' %
-                                     self.RE_SHORT_DOI_PATTERN)
-
-        if short_form_match.match(doi_str):
-            self._short_doi = doi_str
-            logger.debug("Parsing short form doi: %s" % doi_str)
-        elif long_form_match.search(doi_str):
-            self._short_doi = long_form_match.search(doi_str).group()
-            logger.debug("Parsing long form doi: %s" % doi_str)
-        elif ambra_doi_match.search(doi_str):
-            self._short_doi = ambra_doi_match.search(doi_str).group()
-            logger.debug("Parsing ambra-style doi: %s" % doi_str)
-        else:
-            raise ValueError("Couldn't parse doi %s" % doi_str)
-
-        logger.debug("Constructed Doi object with short-form doi: %s" % self._short_doi)
-
-    def __cmp__(self, other):
-        return (self._short_doi == other)
-
-    @property
-    def short(self):
-        return self._short_doi
-
-    @property
-    def long(self):
-        return "%s%s" % (self._pub_prefix, self._short_doi)
-
-    def __str__(self):
-        return self._short_doi
-
-
-class XMLObject(object):
-    root = None
-    self_ref_name = None
-
-    def __init__(self, xml_file):
-        xml_file.seek(0)
-        xml = xml_file.read()
-        print(xml_file, ": ", xml[:300])
-        try:
-            main_parser = XMLObject.get_parser()
-            self.root = etree.XML(xml, main_parser)
-        except (etree.XMLSyntaxError, ValueError), e:
-            logger.debug("Unable to parse %s due to the following syntax error: %s" %
-                           (xml_file, unicode(e)))
-            logger.debug("Falling back to more relaxed parser ...")
-            fallback_parser = XMLObject.get_fallback_parser()
-            try:
-                self.root = etree.XML(xml, fallback_parser)
-            except etree.XMLSyntaxError, ee:
-                logger.error("Unable to parse XML file, %s: %s" % (xml_file, ee))
-                raise
-
-        logger.debug("Root: %s" % self.root)
-        self.self_ref_name = "XML document"
-
-    @staticmethod
-    def get_parser():
-        parser = etree.XMLParser(dtd_validation=True, no_network=False)
-        parser.resolvers.add(CustomResolver())
-        return parser
-
-    @staticmethod
-    def get_fallback_parser():
-        parser = etree.XMLParser(recover=True, dtd_validation=False, no_network=True)
-        return parser
-
-    @staticmethod
-    def check_for_dtd_error(xml_file):
-        try:
-            xmltree = etree.parse(xml_file, XMLObject.get_parser())
-        except etree.XMLSyntaxError, e:
-            return unicode(e)
-        return ""
-
-
-class GOXMLObject(XMLObject):
-    """
-    def __init__(self, xml_file):
-        parser = etree.XMLParser(recover=True)
-        self.root = etree.parse(xml_file, parser)
-        super(GOXMLObject, self).__init__(xml_file)
-        self.self_ref_name = "GO XML Document"
-    """
-    def get_production_task_id(self):
-        prod_ids = self.root.xpath("//header/parameters/parameter[@name='production-task-id']")
-        prod_id = get_single(prod_ids, "guid")
-        return prod_id.attrib['value']
-
-    def get_production_task_name(self):
-        production_task_names = self.root.xpath("//header/parameters/parameter[@name='production-task-name']")
-        production_task_name = get_single(production_task_names, "production task name")
-        return production_task_name.attrib['value']
-
-    def get_metadata_filename(self):
-        prod_ids = self.root.xpath("//filegroup/metadata-file")
-        prod_id = get_single(prod_ids, "guid")
-        return prod_id.attrib['name']
-
-    def get_doi(self):
-        dois = self.root.xpath("//header/parameters/parameter[@name='DOI']")
-        doi = get_single(dois, "DOI")
-        return PLOSDoi(doi.attrib['value'])
-
-    def get_files(self):
-        files = self.root.xpath("//filegroup/file")
-        return [f.attrib['name'] for f in files]
-
-
-class NLMXMLObject(XMLObject):
-
-    def __init__(self, xml_file):
-        super(NLMXMLObject, self).__init__(xml_file)
-        self.self_ref_name = "NLM XML Document"
-
-    def get_si_links(self):
-        si_links = []
-        for i, si in enumerate(self.root.xpath("//supplementary-material")):
-            si_elem = {}
-            try:
-                si_elem['label'] = si.xpath("label")[0].text
-            except IndexError:
-                logger.error("%s %s SI entry is missing a label" %
-                             (ordinal_format(i), self.self_ref_name))
-                continue
-
-            try:
-                si_elem['link'] = si.attrib['{http://www.w3.org/1999/xlink}href']
-            except KeyError:
-                logger.error("%s %s SI entry, '%s', is missing an href" %
-                             (ordinal_format(i), self.self_ref_name, si_elem['label']))
-
-            si_links.append(si_elem)
-
-        return si_links
-
-    def get_fig_links(self):
-        fig_links = []
-        for i, fig in enumerate(self.root.xpath("//fig")):
-            fig_elem = {}
-            try:
-                fig_elem['label'] = fig.xpath("label")[0].text
-            except IndexError:
-                logger.error("%s figure in %s is missing a label" %
-                             (ordinal_format(i), self.self_ref_name))
-                continue
-
-            try:
-                graphic = fig.xpath("graphic")[0]
-                fig_elem['link'] = graphic.attrib['{http://www.w3.org/1999/xlink}href']
-            except IndexError:
-                logger.error("%s figure in %s, '%s', is missing a graphic entry" %
-                             (ordinal_format(i), self.self_ref_name, fig_elem['label']))
-            except KeyError:
-                logger.error("%s figure in %s, '%s', is missing an href" %
-                             (ordinal_format(i), self.self_ref_name, fig_elem['label']))
-
-            fig_links.append(fig_elem)
-
-        return fig_links
-
-
-class ArticleXMLObject(NLMXMLObject):
-    def __init__(self, *args):
-        super(ArticleXMLObject, self).__init__(*args)
-        self.self_ref_name = "article xml.orig"
-
-
-class MetadataXMLObject(NLMXMLObject):
-    def __init__(self, *args):
-        super(MetadataXMLObject, self).__init__(*args)
-        self.self_ref_name = "article xml.orig"
-
-    def get_parser(self):
-        return etree.XMLParser(recover=True)
 
 
 def normalized_find(target_list, key, value, normalizer=None):
@@ -360,3 +139,45 @@ def zip_together_assets(expected, adding, matching_level=0, partial_completion=[
                                [adding[i] for i in xrange(len(adding)) if not adding_match_mask[i]],
                                matching_level+1, partial_completion)
 
+
+class PLOSDoi(object):
+    RE_SHORT_DOI_PATTERN = "[a-z]*\.[0-9]*"
+
+    _short_doi = None
+
+    def __init__(self, doi_str):
+        self._pub_prefix = "10.1371/journal."
+
+        short_form_match = re.compile(self.RE_SHORT_DOI_PATTERN)
+        long_form_match = re.compile('(?<=10\.1371/journal\.)%s' %
+                                     self.RE_SHORT_DOI_PATTERN)
+        ambra_doi_match = re.compile('^(?<=info\:doi/10\.1371/journal\.)%s$' %
+                                     self.RE_SHORT_DOI_PATTERN)
+
+        if short_form_match.match(doi_str):
+            self._short_doi = doi_str
+            logger.debug("Parsing short form doi: %s" % doi_str)
+        elif long_form_match.search(doi_str):
+            self._short_doi = long_form_match.search(doi_str).group()
+            logger.debug("Parsing long form doi: %s" % doi_str)
+        elif ambra_doi_match.search(doi_str):
+            self._short_doi = ambra_doi_match.search(doi_str).group()
+            logger.debug("Parsing ambra-style doi: %s" % doi_str)
+        else:
+            raise ValueError("Couldn't parse doi %s" % doi_str)
+
+        logger.debug("Constructed Doi object with short-form doi: %s" % self._short_doi)
+
+    def __cmp__(self, other):
+        return (self._short_doi == other)
+
+    @property
+    def short(self):
+        return self._short_doi
+
+    @property
+    def long(self):
+        return "%s%s" % (self._pub_prefix, self._short_doi)
+
+    def __str__(self):
+        return self._short_doi
