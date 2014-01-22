@@ -92,7 +92,7 @@ class MetadataPackage(object):
         return sorted(self.metadata.get_si_links(), key=lambda x: x.get('label'))
     
     def __repr__(self):
-        return self._zip_filename
+        return os.path.split(self._zip_filename)[1]
 
 
 class Article(object):
@@ -104,6 +104,7 @@ class Article(object):
     archive_file = None
     xml_orig_file = None
     pdf_file = None
+    _zip_filename = None
 
     def __init__(self, archive_file=None, doi=None, new_cw_file=False, read_only=False):
         self.read_only = read_only
@@ -138,19 +139,7 @@ class Article(object):
             self.archive_file.rename('%s.xml' % self.doi, '%s.xml.orig' % self.doi)
 
     def __repr__(self):
-        return self._zip_filename
-
-    def __del__(self):
-        self.close()
-        # del xml trees
-        #  -
-        # del file objects
-        if self.xml_orig_file:
-            del self.xml_orig_file
-        if self.archive_file:
-            del self.archive_file
-        if self.pdf_file:
-            del self.pdf_file
+        return os.path.split(self._zip_filename)[1]
 
     def close(self):
         if self.xml_orig_file:

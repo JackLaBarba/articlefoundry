@@ -1,6 +1,4 @@
 import os
-import glob
-import shutil
 
 from filetestcase import FileTestCase
 from articlefoundry import Article, MetadataPackage
@@ -13,8 +11,8 @@ class TestArticle(FileTestCase):
     
     def setUp(self):
         self.test_file_dir = os.path.join(os.path.split(__file__)[0], 'files/')
-        test_zip = self.backup_file('pone.0077196.zip')
-        self.a = Article(test_zip, new_cw_file=True, read_only=True)
+        self.test_zip = self.backup_file('pone.0077196.zip')
+        self.a = Article(self.test_zip, new_cw_file=True, read_only=False)
 
         test_zip = self.backup_file('pone_009486b4-32e4-4646-9249-9244544b8719.zip')
         self.m = MetadataPackage(test_zip)
@@ -44,11 +42,31 @@ class TestArticle(FileTestCase):
         logger.debug("Missing si assets: %s" % self.a.list_missing_si_assets())
 
     def test_consume_si_package(self):
+        before_files = set(self.a.archive_file.list())
+        logger.debug("before files: %s" % before_files)
         self.a.consume_si_package(self.m)
+        expected_diff = set(["pone.0077196.s001.doc",
+                             "pone.0077196.s002.doc",
+                             "pone.0077196.s003.doc",
+                             "pone.0077196.s004.doc"])
+        after_files = set(self.a.archive_file.list())
+        self.assertEqual((after_files - before_files), expected_diff,
+                         msg="didn't absorb SI files")
+
+        # verify that we saved the package
         self.a.close()
+        self.a = Article(self.test_zip, new_cw_file=False, read_only=True)
+
+        after_files = set(self.a.archive_file.list())
+
+        logger.debug("after files: %s" % after_files)
+        logger.debug("difference: %s" % (after_files - before_files))
+        self.assertEqual((after_files - before_files), expected_diff,
+                         msg="New package didn't absorb SI files")
 
     def test_check_for_dtd_error(self):
         logger.debug(self.a.check_for_dtd_error())
+
 
 class TestMetadataPackage(FileTestCase):
 

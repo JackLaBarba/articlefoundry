@@ -37,7 +37,7 @@ def consume_si(args):
 
 
 def check_for_dtd_error(args):
-    a = Article(archive_file=args.article_file.name)
+    a = Article(archive_file=args.article_file.name, read_only=True)
     error = a.check_for_dtd_error()
     if error:
         if args.format_ariespull:

@@ -26,12 +26,15 @@ class ArchiveFile():
         self.filename = filename
 
     def _get_working_filename(self, filename):
+        if not self.working_dir:
+            raise RuntimeError("Can't perform this action on an un-unzipped archive")
         return os.path.join(self.working_dir, filename)
 
     def _check_for_file_existence(self, filename):
         if not self.file_exists(filename):
             logger.debug("archive files: %s" % self.list())
-            raise KeyError("Archive does not contain a file named '%s'." % filename)
+            raise KeyError("Archive (%s) does not contain a file named '%s'." %
+                           (self, filename))
 
     def file_exists(self, filename):
         return filename in self.list()
@@ -76,7 +79,7 @@ class ArchiveFile():
             self.unzip()
         self._check_for_file_existence(filename)
         working_filename = os.path.join(self.working_dir, filename)
-        f = file(os.path.join(self.working_dir, working_filename), 'rw')
+        f = file(os.path.join(self.working_dir, working_filename), 'rb')
         return f
 
     def rename(self, before, after):
@@ -99,7 +102,14 @@ class ArchiveFile():
             return False
 
     def add(self, f, filename):
+        logger.debug("Adding %s to %s as '%s ...'" % (f, self, filename))
+        if not self.unzipped:
+            self.unzip()
         f.seek(0)
-        with open(self._get_working_filename(filename), 'w') as new_f:
-            for line in f:
-                new_f.write(line)
+        with open(self._get_working_filename(filename), 'wb') as new_f:
+            logger.debug("Writing into %s ..." % self._get_working_filename(filename))
+            for chunk in f:
+                new_f.write(chunk)
+
+    def __repr__(self):
+        return os.path.split(self.filename)[1]

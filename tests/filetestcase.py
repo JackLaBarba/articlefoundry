@@ -4,6 +4,7 @@ import glob
 
 import unittest
 
+
 class FileTestCase(unittest.TestCase):
 
     test_file_dir = None
