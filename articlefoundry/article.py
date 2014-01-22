@@ -3,9 +3,9 @@ import re
 
 from lxml import etree
 
-from articlefoundry.file_drivers import ArchiveFile
-from articlefoundry.xml_drivers import GOXMLObject, MetadataXMLObject, NLMXMLObject, XMLObject
-from articlefoundry.util import PLOSDoi, zip_together_assets, get_pdf_page_count
+from file_drivers import ArchiveFile
+from xml_drivers import GOXMLObject, MetadataXMLObject, NLMXMLObject, XMLObject
+from util import PLOSDoi, zip_together_assets, get_pdf_page_count
 
 import logging
 logging.basicConfig(level=logging.DEBUG,

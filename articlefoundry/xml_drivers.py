@@ -2,7 +2,7 @@ from lxml import etree
 import urlparse
 import os
 
-from articlefoundry.util import download_file, get_single, ordinal_format, PLOSDoi
+from util import download_file, get_single, ordinal_format, PLOSDoi
 
 import logging
 logger = logging.getLogger(__name__)
