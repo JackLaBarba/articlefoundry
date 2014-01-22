@@ -44,6 +44,7 @@ def check_for_dtd_error(args):
             print "error: DTD error: %s" % error
         else:
             print error
+    a.close()
 
 
 def parse_call():
