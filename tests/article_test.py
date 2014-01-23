@@ -48,8 +48,11 @@ class TestArticle(FileTestCase):
         expected_diff = set(["pone.0077196.s001.doc",
                              "pone.0077196.s002.doc",
                              "pone.0077196.s003.doc",
-                             "pone.0077196.s004.doc"])
+                             "pone.0077196.s004.doc",
+                             "pone.0077196.strk.tif"])
         after_files = set(self.a.archive_file.list())
+        logger.debug("New Files: %s" % (after_files - before_files))
+        logger.debug("Expected New Files: %s" % expected_diff)
         self.assertEqual((after_files - before_files), expected_diff,
                          msg="didn't absorb SI files")
 
