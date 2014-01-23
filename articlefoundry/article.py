@@ -5,7 +5,7 @@ from lxml import etree
 
 from file_drivers import ArchiveFile
 from xml_drivers import GOXMLObject, MetadataXMLObject, NLMXMLObject, XMLObject
-from util import PLOSDoi, zip_together_assets, get_pdf_page_count
+from util import PLOSDoi, zip_together_assets, get_pdf_page_count, normalize_string
 
 import logging
 logging.basicConfig(level=logging.DEBUG,
@@ -21,6 +21,7 @@ class MetadataPackage(object):
 
     _goxml_filename = None
     _metadata_filename = None
+    _archive_file = None
 
     goxml = None
     metadata = None
@@ -89,7 +90,22 @@ class MetadataPackage(object):
         self.verify_si_export()
         if not self.metadata:
             self._read_metadata()
-        return sorted(self.metadata.get_si_links(), key=lambda x: x.get('label'))
+
+        si_files = filter(lambda x: normalize_string(x['label']) != normalize_string('Striking Image'),
+                          self.metadata.get_si_links())
+        return si_files
+
+    def get_striking_image_filename(self):
+        si = self.metadata.get_si_links()
+        striking_images = filter(lambda x: normalize_string(x['label']) == normalize_string('Striking Image'),
+                                 si)
+        if len(striking_images) == 1:
+            return striking_images[0]
+        if len(striking_images) >= 1:
+            logger.warning("Encountered more than one striking image: %s.  Returning just the first." % striking_images)
+            return striking_images[0]
+        else:
+            return False
     
     def __repr__(self):
         return os.path.split(self._zip_filename)[1]
@@ -237,5 +253,16 @@ class Article(object):
             self.archive_file.add(mdpack._archive_file.get(asset['new']['link']),
                                   asset['expected']['link'])
 
-        logger.info("Inserted %s file(s) into %s" %
+        logger.info("Inserted %s SI file(s) into %s" %
                     (len(asset_zipper), self))
+
+        # Handle Striking Image
+        striking_image = mdpack.get_striking_image_filename()
+        if striking_image:
+            striking_image_filename_pattern = "%s.strk.tif"
+            striking_image_filename = striking_image_filename_pattern % self.doi.short
+            logger.info("Inserting striking image %s -> %s ..." %
+                        (striking_image['link'], striking_image_filename))
+            self.archive_file.add(mdpack._archive_file.get(striking_image['link']),
+                                  striking_image_filename)
+

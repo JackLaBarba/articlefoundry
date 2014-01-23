@@ -147,7 +147,7 @@ class NLMXMLObject(XMLObject):
 
             si_links.append(si_elem)
 
-        return si_links
+        return sorted(si_links, key=lambda x: x.get('label'))
 
     def get_fig_links(self):
         fig_links = []
