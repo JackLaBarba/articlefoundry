@@ -1,14 +1,13 @@
 import os
 import argparse
 from article import Article, MetadataPackage
+from util import find_si_package
 import logging
 logging.basicConfig(level=logging.DEBUG,
                     format=("%(levelname)-8s "
                             "%(message)s"))
 logging.getLogger('').setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
-
-from api import AIapi
 
 SI_DIR = os.path.abspath("/var/local/delivery/")
 
@@ -24,14 +23,17 @@ def consume_si(args):
         si = MetadataPackage(archive_file=args.si_package.name)
     else:
         logger.debug("No metadata package provided in call, trying to find one in AI ...")
-        with AIapi() as ai:
-            si_guid = ai.get_si_guid(a.doi)
+        si_package = find_si_package(a.doi) #TODO: add manual directory input
+        if not si_package:
+            a.close()
+            raise IOError("Can't find metadata package for %s" %
+                          a.doi)
         try:
-            si_filename = os.path.join(SI_DIR, "%s.zip" % si_guid)
-            si = MetadataPackage(archive_file=si_filename)
+            si = MetadataPackage(archive_file=si_package)
         except IOError, e:
+            a.close()
             raise IOError("Can't find metadata package for %s at %s" %
-                          (a.doi, si_filename))
+                          (a.doi, si_package))
     a.consume_si_package(si)
     a.close()
 

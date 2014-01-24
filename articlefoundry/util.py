@@ -72,7 +72,7 @@ def download_file(url, local):
         local_file.write(f.read())
 
 
-def find_si_guid(doi, locations=None):
+def find_si_package(doi, locations=None):
     logger.debug("Finding SI GUID ... ")
     if not locations:
         locations = ['/var/spool/delivery/',
@@ -90,8 +90,7 @@ def find_si_guid(doi, locations=None):
                     if doi in l:
                         return os.path.abspath(filename)
         logger.debug("SI package not found in %s" % directory)
-    logger.debug("Ran out of possible loctions for SI package.")
-    logger.warning("SI package not found!")
+    logger.debug("Ran out of possible locations for SI package.")
     return False
 
 

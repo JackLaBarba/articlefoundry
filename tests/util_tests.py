@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 from filetestcase import FileTestCase
 from articlefoundry.xml_drivers import *
 
-from articlefoundry.util import find_si_guid
+from articlefoundry.util import find_si_package
 
 
 class TestSIFuncs(FileTestCase):
@@ -82,5 +82,5 @@ class TestStandaloneUtil(FileTestCase):
         if not os.path.exists('/var/spool/delivery/'):
             return True
 
-        find_si_guid('pone.0086710')
+        find_si_package('pone.0086710')
 
