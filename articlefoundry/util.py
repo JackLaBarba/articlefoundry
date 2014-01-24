@@ -75,7 +75,9 @@ def find_si_guid(doi, locations=None):
         locations = ['/var/spool/delivery/',
                      '/var/spool/delivery-archive/']
     for directory in locations:
-        for filename in glob.glob(os.path.join(directory, "*.go.xml")):
+        filenames = glob.glob(os.path.join(directory, "*.go.xml"))
+        sorted_filenames = sorted(filenames, key=lambda x: -os.path.getmtime(x))
+        for filename in sorted_filenames:
             with open(filename, 'r') as f:
                 for l in f.readlines():
                     if doi in l:
