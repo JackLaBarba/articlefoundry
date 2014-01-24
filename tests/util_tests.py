@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 from filetestcase import FileTestCase
 from articlefoundry.xml_drivers import *
 
+from articlefoundry.util import find_si_guid
+
 
 class TestSIFuncs(FileTestCase):
     
@@ -72,3 +74,13 @@ class TestXMLParsing(FileTestCase):
         output = XMLObject.check_for_dtd_error(article_file.read())
         logger.debug(output)
         assert output
+
+class TestStandaloneUtil(FileTestCase):
+
+    def test_find_si_guid(self):
+        # only run this on systems where deliveries exist
+        if not os.path.exists('/var/spool/delivery/'):
+            return True
+
+        find_si_guid('pone.0086710')
+

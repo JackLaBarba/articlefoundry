@@ -1,5 +1,7 @@
 from __future__ import with_statement
 import re
+import os
+import glob
 import string
 import urllib2
 
@@ -65,6 +67,19 @@ def download_file(url, local):
     # Open our local file for writing
     with open(local, "wb") as local_file:
         local_file.write(f.read())
+
+
+def find_si_guid(doi, locations=None):
+    logger.debug("Finding SI GUID ... ")
+    if not locations:
+        locations = ['/var/spool/delivery/',
+                     '/var/spool/delivery-archive/']
+    for directory in locations:
+        for filename in glob.glob(os.path.join(directory, "*.go.xml")):
+            with open(filename, 'r') as f:
+                for l in f.readlines():
+                    if doi in l:
+                        return os.path.abspath(filename)
 
 
 def normalized_find(target_list, key, value, normalizer=None):

@@ -105,7 +105,7 @@ class MetadataPackage(object):
             logger.warning("Encountered more than one striking image: %s.  Returning just the first." % striking_images)
             return striking_images[0]
         else:
-            return False
+            return None
     
     def __repr__(self):
         return os.path.split(self._zip_filename)[1]
