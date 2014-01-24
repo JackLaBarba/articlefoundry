@@ -6,6 +6,9 @@ import string
 import urllib2
 
 import logging
+logging.basicConfig(level=logging.DEBUG,
+                    format=("%(levelname)-8s "
+                            "%(message)s"))
 logger = logging.getLogger(__name__)
 
 
@@ -73,15 +76,23 @@ def find_si_guid(doi, locations=None):
     logger.debug("Finding SI GUID ... ")
     if not locations:
         locations = ['/var/spool/delivery/',
-                     '/var/spool/delivery-archive/']
+                     '/var/spool/delivery-archive/aries/aries2plos/']
     for directory in locations:
+        logger.debug("Searching %s for SI package ..." % directory)
         filenames = glob.glob(os.path.join(directory, "*.go.xml"))
+        logger.debug("Found %s candidate file(s)" % len(filenames))
+        logger.debug("Sorting by mtime desc ...")
         sorted_filenames = sorted(filenames, key=lambda x: -os.path.getmtime(x))
+        logger.debug("Searching files for DOI ...")
         for filename in sorted_filenames:
             with open(filename, 'r') as f:
                 for l in f.readlines():
                     if doi in l:
                         return os.path.abspath(filename)
+        logger.debug("SI package not found in %s" % directory)
+    logger.debug("Ran out of possible loctions for SI package.")
+    logger.warning("SI package not found!")
+    return False
 
 
 def normalized_find(target_list, key, value, normalizer=None):
