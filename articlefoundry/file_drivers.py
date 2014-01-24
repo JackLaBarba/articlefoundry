@@ -104,6 +104,9 @@ class ArchiveFile():
         logger.debug("Adding %s to %s as '%s ...'" % (f, self, filename))
         if not self.unzipped:
             self.unzip()
+        if filename in self.list():
+            logger.debug("Found existing file with the same name.  Removing original ...")
+            self.remove(filename)
         f.seek(0)
         with open(self._get_working_filename(filename), 'wb') as new_f:
             logger.debug("Writing into %s ..." % self._get_working_filename(filename))
